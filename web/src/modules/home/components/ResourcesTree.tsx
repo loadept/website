@@ -33,7 +33,7 @@ export const ResourcesTree = (
 
           {expandedResources.includes(resource.label) && (
             <ul className="ml-6 mt-2 space-y-1">
-              {resource.label === "Posts"
+              {resource.label === "Notas"
                 ?
                   categories.map((category, k) => {
                     const filteredPosts = posts.filter((a) => a.category === category)

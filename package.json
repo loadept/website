@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "dev": "bun run --cwd web dev",
+    "build": "bun run --cwd web build",
+    "preview": "bun run --cwd web preview",
+    "astro": "bun run --cwd web astro",
+    "install:web": "bun install --cwd web"
+  }
+}

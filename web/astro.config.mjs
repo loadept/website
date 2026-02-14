@@ -9,7 +9,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  outDir: '../public',
+  outDir: './static',
   site: 'https://loadept.com',
   vite: {
     plugins: [tailwindcss()]
