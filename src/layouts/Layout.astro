@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css'
-import { ClientRouter } from 'astro:transitions'
 import Header from '../modules/shared/components/Header.astro'
 import Footer from '../modules/shared/components/Footer.astro'
 
@@ -12,8 +11,8 @@ interface Props {
 
 const {
 	title,
-	description = 'Blog de programación donde comparto mis notas, proyectos y documentación técnica. Exploraciones en desarrollo, soluciones a problemas y guías prácticas que me sirvieron y quizá también te ayuden.',
-	keywords = 'markdown, docs, development, desarrollo, programación'
+	description,
+	keywords,
 } = Astro.props
 
 const image = 'https://loadept.com/loadept.webp'
@@ -39,7 +38,6 @@ const canonicalURL = new URL(Astro.url.pathname, 'https://loadept.com')
 			href="/images/loadept-glitch.webp"
 			as="image"
 			type="image/webp"
-			crossorigin="anonymous"
 		/>
 
 		<meta name="viewport" content="width=device-width" />
@@ -63,11 +61,20 @@ const canonicalURL = new URL(Astro.url.pathname, 'https://loadept.com')
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="canonical" href={canonicalURL} />
   	<link rel="sitemap" href="/sitemap-index.xml" />
-		<ClientRouter />
+		<script is:inline>
+			(() => {
+				const theme = localStorage.getItem("theme") || "light"
+
+				document.documentElement.classList.toggle(
+					"dark",
+					theme === "dark"
+				)
+			})()
+		</script>
 	</head>
-	<body class="min-h-screen flex flex-col">
+	<body class="min-h-screen bg-background text-foreground flex flex-col">
 		<Header />
-			<main class="grow mt-12">
+			<main class="grow">
 				<slot />
 			</main>
 		<Footer />

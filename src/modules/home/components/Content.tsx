@@ -1,3 +1,4 @@
+import { Code } from "lucide-preact"
 import type { Post, Resources } from '../types/home'
 import { ResourcesTree } from './ResourcesTree'
 
@@ -9,12 +10,12 @@ interface Props {
 
 export const Content = ({ categories, posts, resources }: Props) => {
   return (
-    <section className="space-y-6 mt-15 mb-30">
-      <div className="flex items-center gap-3">
-        <span className="text-3xl text-[#e06c75]"></span>
-        <h2 className="text-2xl font-bold text-[#e5c07b]">Contenido</h2>
-      </div>
-      <ResourcesTree resources={resources} categories={categories} posts={posts} />
+    <section className="space-y-6 mt-15 mb-16">        
+      <h2 className="flex items-center text-2xl font-bold mb-6 border-b border-border pb-3">
+        <Code class="w-5 h-5 mr-2" />
+        Contenido
+      </h2>
+      <ResourcesTree categories={categories} posts={posts} resources={resources}  />
     </section>
   )
 }

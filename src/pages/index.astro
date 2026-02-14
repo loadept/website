@@ -3,8 +3,8 @@ import Layout from '../layouts/Layout.astro'
 import Intro from '../modules/home/components/intro.astro'
 import { Content } from '../modules/home/components/Content'
 import type { Resources } from '../modules/home/types/home'
-import type { FrontMatter, FrontMatterResource } from '../modules/shared/types/frontmatter'
-import type { MarkdownInstance } from 'astro'
+import type { FrontMatter } from '../modules/shared/types/frontmatter'
+import ContactSection from '../modules/home/components/ContactSection.astro'
 
 const allPosts = import.meta.glob('../content/posts/**/*.md', { eager: true })
 const posts = Object.entries(allPosts).map(([filePath, post]: [string, any]) => {
@@ -22,52 +22,24 @@ const categories: string[] = Array.from(
 	new Map(posts.map(p => ([p.category, p.category]))).values()
 )
 
-const goResources = import.meta.glob<MarkdownInstance<FrontMatterResource>>('../content/resources/go-packages/*.md', { eager: true })
-const goPackages = Object.entries(goResources).map(([filePath, pkg]) => {
-	const slug = filePath.replace('../content/resources/go-packages/', '').replace('.md', '').trim()
-	const frontmatter: FrontMatterResource = pkg.frontmatter
-
-	return {
-		label: frontmatter.title,
-		href: `/${slug}`,
-	}
-})
-
-const toolsResources = import.meta.glob('../content/resources/tools/**', { eager: true })
-const tools = Object.entries(toolsResources).map(([filePath, module]: [string, any]) => {
-    const slug = filePath.replace('../content/resources/tools/', '').replace(/\.(md|astro)$/, '')
-      .trim()
-      .toLocaleLowerCase()
-    const title = module.frontmatter?.title || module.metadata?.title || slug
-
-	return {
-		label: title,
-		href: `/${slug}`,
-	}
-})
-
 const resources: Resources[] = [
+	{
+		label: "Software",
+		items: [],
+	},
   {
     label: "Posts",
     items: []
-  },
-  {
-    label: "Paquetes Go",
-    items: goPackages,
-  },
-  {
-    label: "Más herramientas",
-    items: tools,
-  },
+  }
 ]
 ---
 
 <Layout 
-	title="Blog de Desarrollo de Software, Go y Linux"
-	description="Blog de programación donde comparto mis notas, proyectos, soluciones a problemas y guías prácticas que me sirvieron y quizá también te ayuden."
-	keywords="blog programación, go, golang, linux, backend, devops, tutoriales, software development"
+	title="loadept"
+	description="Desarrollador de software. Notas sobre Go, Linux y programación"
+	keywords="notas, go, linux, backend, devops, software development"
 >
-	<div class="container mx-auto px-4">
+	<div class="max-w-2xl mx-auto px-6 py-12">
 		<Intro />
 		<Content
 			client:load
@@ -75,5 +47,6 @@ const resources: Resources[] = [
 			posts={posts}
 			resources={resources}
 		/>
+		<ContactSection />
 	</div>
 </Layout>

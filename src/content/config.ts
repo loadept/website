@@ -11,16 +11,6 @@ const posts = defineCollection({
   })
 })
 
-const resources = defineCollection({
-  loader: glob({ pattern: 'resources/**/*.md', base: './src/content' }),
-  schema: z.object({
-    title: z.string(),
-    layout: z.string().optional(),
-    description: z.string().optional(),
-  })
-})
-
 export const collections = {
-  posts,
-  resources
+  posts
 }

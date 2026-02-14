@@ -1,4 +1,8 @@
 ---
+import {
+  ChevronLeft,
+} from "lucide-preact"
+
 interface Props {
   href: string
   text: string
@@ -9,8 +13,8 @@ const { href, text } = Astro.props
 
 <a
   href={href}
-  class="inline-flex items-center text-[#61afef] mb-8 hover:text-[#528bff] transition-colors"
+  class="inline-flex items-center text-primary mb-8 hover:underline transition-colors"
 >
-  <span class="text-2xl mr-1"></span>
+  <ChevronLeft className="h-5 w-5 mr-1" />
   {text}
 </a>

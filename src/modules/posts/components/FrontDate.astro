@@ -1,5 +1,8 @@
 ---
-import formatDate from '../../shared/utils/formatDate'
+import {
+  Calendar
+} from "lucide-preact"
+import formatDate from "../../shared/lib/formatDate"
 
 interface Props {
   date: string
@@ -7,7 +10,7 @@ interface Props {
 const { date } = Astro.props
 ---
 
-<div class='flex items-center mr-4'>
-  <span class='text-2xl mr-2 text-[#c678dd]'></span>
+<div class="flex items-center mr-4 text-muted-foreground">
+  <Calendar class="h-4 w-4 mr-1" />
   {formatDate(date, 'numeric')}
 </div>

@@ -1,9 +1,32 @@
 ---
-import GlitchLogo from "./GlitchLogo.astro"
-import IntroText from "./IntroText.astro"
+const birthdate = new Date('2003-10-01T00:00:00')
+const currentDate = new Date()
+
+let age = currentDate.getFullYear() - birthdate.getFullYear()
+
+const hasBirthdayPassed = currentDate.getMonth() > birthdate.getMonth() ||(
+  currentDate.getMonth() === birthdate.getMonth() &&
+  currentDate.getDate() >= birthdate.getDate()
+)
+
+if (!hasBirthdayPassed) {
+  age--
+}
 ---
 
-<section class='grid md:grid-cols-[2fr_3fr] gap-5 md:gap-20'>
-  <GlitchLogo />
-  <IntroText />
+<section class="mb-16 space-y-4">
+  <p class="text-base leading-relaxed">
+    Soy Jesus Machaca Hancco tengo {age} años y vivo en <strong class="font-extrabold underline">Perú</strong>.
+    Soy un entusiasta del software libre y el open source. Me apasiona la tecnología,
+    la programación y la música,
+    en especial el <strong class="font-extrabold underline">Metal</strong>,
+    que disfruto escuchar mientras programo porque me motiva mucho.
+  </p>
+  <p class="text-base leading-relaxed">
+    Uno de mis lenguajes favoritos es <strong class="font-extrabold underline">Go</strong>,
+    por su simplicidad y lo divertido que resulta trabajar con él.
+    Dentro de mi stack también manejo con solidez <strong class="font-extrabold underline">Python</strong> y
+    <strong class="font-extrabold underline"> Node.js/Bun</strong>. En mi tiempo libre me gusta explorar nuevas tecnologías,
+    escribir notas sobre lo que aprendo y disfrutar de series o películas.
+  </p>
 </section>
