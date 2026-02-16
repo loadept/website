@@ -5,7 +5,7 @@ export const ResourcesTree = (
   { categories, posts, resources }:
   { categories: string[], posts: Post[], resources: Resources[] }
 ) => {
-  const [expandedResources, setExpandedResources] = useState<string[]>(['Software', 'Posts'])
+  const [expandedResources, setExpandedResources] = useState<string[]>(['Software', 'Notas'])
   const [expandedArticleCategories, setExpandedArticleCategories] = useState<string[]>([])
 
   const toggleSoftware = (resource: string) => {
