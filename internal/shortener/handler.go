@@ -40,6 +40,8 @@ type logEntry struct {
 	CacheHit  bool   `json:"cache_hit,omitempty"`
 	Error     string `json:"error,omitempty"`
 	Addr      string `json:"ip,omitempty"`
+	Country   string `json:"country,omitempty"`
+	RayID     string `json:"ray_id,omitempty"`
 }
 
 func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +51,8 @@ func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
 		Method:    r.Method,
 		Path:      r.URL.Path,
 		Addr:      r.Header.Get("CF-Connecting-IP"),
+		Country:   r.Header.Get("CF-IPCountry"),
+		RayID:     r.Header.Get("CF-Ray"),
 	}
 	defer json.NewEncoder(os.Stdout).Encode(le)
 
@@ -90,6 +94,8 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 		Method:    r.Method,
 		Path:      r.URL.Path,
 		Addr:      r.Header.Get("CF-Connecting-IP"),
+		Country:   r.Header.Get("CF-IPCountry"),
+		RayID:     r.Header.Get("CF-Ray"),
 	}
 	defer json.NewEncoder(os.Stdout).Encode(le)
 
