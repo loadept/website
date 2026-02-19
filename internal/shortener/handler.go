@@ -8,6 +8,7 @@ import (
 	"math/big"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -32,13 +33,32 @@ var (
 	}
 )
 
+type logEntry struct {
+	Timestamp string `json:"timestamp"`
+	Method    string `json:"method,omitempty"`
+	Path      string `json:"path,omitempty"`
+	CacheHit  bool   `json:"cache_hit,omitempty"`
+	Error     string `json:"error,omitempty"`
+	Addr      string `json:"ip,omitempty"`
+}
+
 func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
+	// log entry (addr will be obtained from headers set by Cloudflare)
+	le := &logEntry{
+		Timestamp: time.Now().Format(time.RFC3339),
+		Method:    r.Method,
+		Path:      r.URL.Path,
+		Addr:      r.Header.Get("CF-Connecting-IP"),
+	}
+	defer json.NewEncoder(os.Stdout).Encode(le)
+
 	ctx := r.Context()
 	shortCode := r.PathValue("code")
 
 	cacheMu.RLock()
 	if cachedURL, ok := cache[shortCode]; ok {
 		cacheMu.RUnlock()
+		le.CacheHit = true
 		http.Redirect(w, r, cachedURL, http.StatusFound)
 		return
 	}
@@ -46,6 +66,7 @@ func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
 
 	originalURL, err := h.s.GetURL(ctx, shortCode)
 	if err != nil {
+		le.Error = "Failed to get URL from database: " + err.Error()
 		if errors.Is(err, storage.ErrShortURLNotFound) {
 			http.NotFound(w, r)
 			return
@@ -63,6 +84,15 @@ func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
 type m map[string]any
 
 func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
+	// log entry (addr will be obtained from headers set by Cloudflare)
+	le := &logEntry{
+		Timestamp: time.Now().Format(time.RFC3339),
+		Method:    r.Method,
+		Path:      r.URL.Path,
+		Addr:      r.Header.Get("CF-Connecting-IP"),
+	}
+	defer json.NewEncoder(os.Stdout).Encode(le)
+
 	ctx := r.Context()
 	headerToken := r.Header.Get("Authorization")
 	if !strings.HasPrefix(headerToken, "Bearer") {
@@ -78,6 +108,7 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 		nil,
 	)
 	if err != nil {
+		le.Error = "Failed to create request: " + err.Error()
 		writeJSON(w, m{"detail": "failed to create request"}, http.StatusInternalServerError)
 		return
 	}
@@ -85,6 +116,7 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		le.Error = "Failed to fetch user info: " + err.Error()
 		writeJSON(w, m{"detail": "failed to fetch user info"}, http.StatusInternalServerError)
 		return
 	}
@@ -100,12 +132,14 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 		Login string `json:"login"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&githubUser); err != nil {
+		le.Error = "Failed to decode user info: " + err.Error()
 		writeJSON(w, m{"detail": "failed to decode user info"}, http.StatusInternalServerError)
 		return
 	}
 
-	_, err = h.sa.GetUserByGithubID(ctx, githubUser.ID)
+	user, err := h.sa.GetUserByGithubID(ctx, githubUser.ID)
 	if err != nil {
+		le.Error = "Failed to get user from database: " + err.Error()
 		if errors.Is(err, storage.ErrUserNotFound) {
 			writeJSON(w, m{"detail": "user not found"}, http.StatusUnauthorized)
 			return
@@ -116,6 +150,7 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 
 	var body storage.ShortURL
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		le.Error = "Failed to decode request body: " + err.Error()
 		writeJSON(w, m{"detail": "invalid request body"}, http.StatusBadRequest)
 		return
 	}
@@ -125,15 +160,22 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parsedURL, err := url.Parse(body.OriginalURL)
-	if err != nil || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
+	if err != nil {
+		le.Error = "Failed to parse original_url: " + err.Error()
 		writeJSON(w, m{"detail": "invalid original_url"}, http.StatusBadRequest)
 		return
 	}
+	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+		writeJSON(w, m{"detail": "original_url must start with http:// or https://"}, http.StatusBadRequest)
+		return
+	}
+
 	body.OriginalURL = parsedURL.String()
 
 	if body.ShortCode == "" {
 		code, err := generateBase62Code(4)
 		if err != nil {
+			le.Error = "Failed to generate short code: " + err.Error()
 			writeJSON(w, m{"detail": "failed to generate short code"}, http.StatusInternalServerError)
 			return
 		}
@@ -148,6 +190,7 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 
 	shortURL, err := h.s.SaveURL(ctx, &body)
 	if err != nil {
+		le.Error = "Failed to save short url: " + err.Error()
 		if errors.Is(err, storage.ErrShortURLCodeExists) {
 			writeJSON(w, m{"detail": "short_code already exists"}, http.StatusConflict)
 			return
@@ -161,7 +204,7 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, m{
-		"message": "success",
+		"message": "short url created successfully by " + user.Identifier,
 		"url":     shortURL,
 	}, http.StatusCreated)
 }
