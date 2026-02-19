@@ -65,7 +65,7 @@ func main() {
 		IdleTimeout:  time.Duration(cfg.HTTP.IdleTimeoutSeconds) * time.Second,
 	}
 	go func() {
-		log.Printf("server listen on %s\n", server.Addr)
+		log.Println("server listen on", server.Addr)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("server error: %v", err)
 		}
@@ -88,7 +88,7 @@ func fatalIfErr(err error) {
 	}
 }
 
-// FileSystem Wrapper
+// FileServer Wrapper
 type neuteredFS struct{ fs http.FileSystem }
 
 func (n neuteredFS) Open(name string) (http.File, error) {
