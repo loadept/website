@@ -1,0 +1,28 @@
+version: "2"
+
+run:
+  timeout: "2m"
+
+linters:
+  default: none
+  enable:
+    - govet
+    - staticcheck
+    - errcheck
+    - ineffassign
+    - unconvert
+    - unused
+    - revive
+    - gosec
+    - errorlint
+    - prealloc
+
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
