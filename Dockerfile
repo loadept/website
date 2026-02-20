@@ -13,10 +13,10 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=statics /usr/src/app/static web/static
-RUN go build -trimpath
+RUN go build -trimpath -o server
 
 FROM gcr.io/distroless/static-debian12:nonroot AS release
 WORKDIR /app
-COPY --from=compile /usr/src/app/loadept.com .
+COPY --from=compile /usr/src/app/server .
 
-ENTRYPOINT [ "./loadept.com" ]
+ENTRYPOINT [ "./server" ]
