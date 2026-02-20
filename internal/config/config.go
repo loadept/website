@@ -1,3 +1,6 @@
+// Package config It allows you to create application configurations from a YAML file.
+// NOTE: This implementation is in case my application grows and this type of configuration
+// is needed. For now, what I tried to do was just unnecessary over-engineering :)
 package config
 
 import (
