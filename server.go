@@ -49,8 +49,8 @@ func main() {
 	fatalIfErr(err)
 	staticFS := neuteredFS{fs: http.FS(subFS)}
 	mux.Handle("GET /", http.FileServer(staticFS))
-	mux.HandleFunc("GET /{code}", shortHandler.RedirectURL)
-	mux.HandleFunc("POST /shorten", shortHandler.CreateURL)
+	mux.HandleFunc("GET /s/{code}", shortHandler.RedirectURL)
+	mux.HandleFunc("POST /s/shorten", shortHandler.CreateURL)
 
 	server := http.Server{
 		Addr:         os.Getenv("ADDR"),
