@@ -2,7 +2,7 @@
 title: ¿Qué es HTTPS?
 date: 2025-09-21
 keywords: [linux, http, servidores]
-category: Linux and Servers
+category: Linux y servidores
 ---
 
 **HTTPS** es una versión segura del protocolo **HTTP**.

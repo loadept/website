@@ -2,7 +2,7 @@
 title: ¿Qué es HTTP?
 date: 2025-09-21
 keywords: [linux, http, servidores]
-category: Linux and Servers
+category: Linux y servidores
 ---
 
 **HTTP** (*Hyper Text Transfer Protocol*) es un protocolo que se utiliza para la comunicación en la web entre dos partes: un **cliente** (como un navegador) y un **servidor**.

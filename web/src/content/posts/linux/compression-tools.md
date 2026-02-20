@@ -2,7 +2,7 @@
 title: Herramientas de compresión en Linux
 date: 2025-05-26
 keywords: [linux, terminal, gzip, xz, 7zip]
-category: Linux and Servers
+category: Linux y servidores
 ---
 
 En Linux, existen varias herramientas de compresión como **gz** o **zip**, algunas más robustas que otras. A continuación, revisaremos las más comunes y mostraremos ejemplos de compresión de archivos y directorios, pero antes, un pequeño cuadro de comparación.
