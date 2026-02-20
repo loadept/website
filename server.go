@@ -2,45 +2,38 @@ package main
 
 import (
 	"context"
+	"embed"
 	"errors"
-	"flag"
 	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"path"
 	"syscall"
 	"time"
 
-	"github.com/loadept/loadept.com/internal/config"
 	"github.com/loadept/loadept.com/internal/shortener"
 	"github.com/loadept/loadept.com/internal/storage"
 	"zombiezen.com/go/sqlite"
 	"zombiezen.com/go/sqlite/sqlitex"
 )
 
+//go:embed all:web/static
+var staticFiles embed.FS
+
 func main() {
 	log.SetFlags(0)
 
-	var confFile string
-	flag.StringVar(&confFile, "config", "", "config file for server")
-	flag.Parse()
-
-	if confFile == "" {
-		log.Fatal("config file not specified")
-	}
-	cfg, err := config.Load(confFile)
-	fatalIfErr(err)
-
-	pool, err := sqlitex.NewPool(cfg.Database.DBPath, sqlitex.PoolOptions{
-		PoolSize: cfg.Database.PoolSize,
+	pool, err := sqlitex.NewPool(os.Getenv("DB_PATH"), sqlitex.PoolOptions{
+		PoolSize: 3,
 		PrepareConn: func(conn *sqlite.Conn) error {
 			return sqlitex.ExecuteScript(conn, fmt.Sprintf(`
 				PRAGMA foreign_keys = ON;
 				PRAGMA busy_timeout = %d;
 				PRAGMA journal_mode = WAL;
-			`, cfg.Database.BusyTimeout), nil)
+			`, 5000), nil)
 		},
 	})
 	fatalIfErr(err)
@@ -52,17 +45,19 @@ func main() {
 	fatalIfErr(err)
 	shortHandler := shortener.NewShortHandler(s, sa)
 
-	staticFs := neuteredFS{fs: http.Dir(cfg.App.StaticFiles)}
-	mux.Handle("GET /", http.FileServer(staticFs))
+	subFS, err := fs.Sub(staticFiles, "web/static")
+	fatalIfErr(err)
+	staticFS := neuteredFS{fs: http.FS(subFS)}
+	mux.Handle("GET /", http.FileServer(staticFS))
 	mux.HandleFunc("GET /{code}", shortHandler.RedirectURL)
 	mux.HandleFunc("POST /shorten", shortHandler.CreateURL)
 
 	server := http.Server{
-		Addr:         cfg.HTTP.Addr,
+		Addr:         os.Getenv("ADDR"),
 		Handler:      mux,
-		ReadTimeout:  time.Duration(cfg.HTTP.ReadTimeoutSeconds) * time.Second,
-		WriteTimeout: time.Duration(cfg.HTTP.WriteTimeoutSeconds) * time.Second,
-		IdleTimeout:  time.Duration(cfg.HTTP.IdleTimeoutSeconds) * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 	go func() {
 		log.Println("server listen on", server.Addr)
