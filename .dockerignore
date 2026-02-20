@@ -10,3 +10,6 @@ dist
 .gitignore
 .github
 README.md
+web/static
+tmp
+

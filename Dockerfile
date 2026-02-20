@@ -1,21 +1,22 @@
-FROM node:24-alpine3.22 AS build
+FROM oven/bun:1 AS bun
+WORKDIR /usr/src/app
 
-WORKDIR /app
+FROM bun AS statics
+COPY web/package.json web/bun.lock ./
+RUN bun install --frozen-lockfile
+COPY web .
+RUN bun run build
 
-RUN corepack enable pnpm
-
-COPY package.json .
-COPY pnpm-lock.yaml .
-COPY pnpm-workspace.yaml .
-
-RUN pnpm i --frozen-lockfile 
-
+FROM golang:1.25-alpine3.23 AS compile
+WORKDIR /usr/src/app
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
+COPY --from=statics /usr/src/app/static web/static
+RUN go build -trimpath
 
-RUN pnpm run build
+FROM gcr.io/distroless/static-debian12:nonroot AS release
+WORKDIR /app
+COPY --from=compile /usr/src/app/loadept.com .
 
-FROM nginx:1.29.4-alpine
-
-WORKDIR /usr/share/nginx/html
-
-COPY --from=build /app/dist .
+ENTRYPOINT [ "./loadept.com" ]
