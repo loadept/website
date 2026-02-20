@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/loadept/loadept.com/internal/config"
+	"github.com/loadept/website/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 

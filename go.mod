@@ -1,4 +1,4 @@
-module github.com/loadept/loadept.com
+module github.com/loadept/website
 
 go 1.25.7
 

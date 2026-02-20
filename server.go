@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/loadept/loadept.com/internal/shortener"
-	"github.com/loadept/loadept.com/internal/storage"
+	"github.com/loadept/website/internal/shortener"
+	"github.com/loadept/website/internal/storage"
 	"zombiezen.com/go/sqlite"
 	"zombiezen.com/go/sqlite/sqlitex"
 )

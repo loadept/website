@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/loadept/loadept.com/internal/storage"
+	"github.com/loadept/website/internal/storage"
 )
 
 type shortHandler struct {
