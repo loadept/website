@@ -26,7 +26,7 @@ var staticFiles embed.FS
 func main() {
 	log.SetFlags(0)
 
-	pool, err := sqlitex.NewPool(os.Getenv("DB_PATH"), sqlitex.PoolOptions{
+	pool, err := sqlitex.NewPool(getEnv("DB_PATH"), sqlitex.PoolOptions{
 		PoolSize: 3,
 		PrepareConn: func(conn *sqlite.Conn) error {
 			return sqlitex.ExecuteScript(conn, fmt.Sprintf(`
@@ -53,7 +53,7 @@ func main() {
 	mux.HandleFunc("POST /s/shorten", shortHandler.CreateURL)
 
 	server := http.Server{
-		Addr:         os.Getenv("ADDR"),
+		Addr:         getEnv("ADDR"),
 		Handler:      mux,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -75,6 +75,14 @@ func main() {
 
 	log.Println("shutting down server...")
 	fatalIfErr(server.Shutdown(shotdownCtx))
+}
+
+func getEnv(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		log.Fatalf("environment variable %s is required", key)
+	}
+	return value
 }
 
 func fatalIfErr(err error) {
