@@ -24,16 +24,21 @@ CREATE INDEX IF NOT EXISTS idx_users_identifier ON users(identifier);
 
 CREATE TABLE IF NOT EXISTS short_urls (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
     original_url TEXT NOT NULL,
-    short_code TEXT NOT NULL UNIQUE,
+    short_code TEXT NOT NULL,
     status TEXT NOT NULL CHECK(status IN ('active', 'deleted')) DEFAULT 'active',
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TEXT
 ) STRICT;
-CREATE INDEX IF NOT EXISTS idx_short_code ON short_urls(short_code);
 CREATE INDEX IF NOT EXISTS idx_original_url ON short_urls(original_url);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_short_urls_name_active
+ON short_urls(name) WHERE status = 'active';
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_short_urls_short_code_active
+ON short_urls(short_code) WHERE status = 'active';
 `
 
 func main() {
