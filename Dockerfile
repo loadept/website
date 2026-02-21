@@ -19,4 +19,4 @@ FROM gcr.io/distroless/static-debian12:nonroot AS release
 WORKDIR /app
 COPY --from=compile /usr/src/app/server .
 
-ENTRYPOINT [ "./server" ]
+ENTRYPOINT [ "/app/server" ]
