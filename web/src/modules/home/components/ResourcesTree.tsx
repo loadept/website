@@ -5,14 +5,7 @@ export const ResourcesTree = (
   { categories, posts, resources }:
   { categories: string[], posts: Post[], resources: Resources[] }
 ) => {
-  const [expandedResources, setExpandedResources] = useState<string[]>(['Software', 'Notas'])
   const [expandedArticleCategories, setExpandedArticleCategories] = useState<string[]>([])
-
-  const toggleSoftware = (resource: string) => {
-    setExpandedResources((prev) =>
-      prev.includes(resource) ? prev.filter((c) => c !== resource) : [...prev, resource],
-    )
-  }
 
   const toggleArticleCategory = (categoryId: string) => {
     setExpandedArticleCategories((prev) =>
@@ -24,57 +17,54 @@ export const ResourcesTree = (
     <div className="space-y-4">
       {resources.map((resource) => (
         <div key={resource.label}>
-          <button
-            onClick={() => toggleSoftware(resource.label)}
-            className="text-primary hover:underline font-normal text-lg cursor-pointer"
-          >
-            {expandedResources.includes(resource.label) ? "▼" : "▶"} {resource.label}
-          </button>
+          <h2 className="text-primary font-normal text-lg">
+            {resource.label}
+          </h2>
 
-          {expandedResources.includes(resource.label) && (
-            <ul className="ml-6 mt-2 space-y-1">
-              {resource.label === "Notas"
-                ?
-                  categories.map((category, k) => {
-                    const filteredPosts = posts.filter((a) => a.category === category)
-                    return (
-                      <li key={k}>
-                        <button
-                          onClick={() => toggleArticleCategory(category)}
-                          className="text-foreground hover:text-primary transition-colors font-normal cursor-pointer"
-                        >
-                          {expandedArticleCategories.includes(category) ? "▼" : "▶"} {category}
-                        </button>
-
-                        {expandedArticleCategories.includes(category) && (
-                          <ul className="ml-6 mt-2 space-y-1">
-                            {filteredPosts.map((post, k) => (
-                              <li key={k}>
-                                <a href={`/posts/${post.slug}`} className="hover:underline">
-                                  {post.title}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    )
-                  })
-                : 
-                  resource.items.map((item) => (
-                    <li>
-                      <a
-                        key={item.label}
-                        href={item.href || "#"}
-                        className="flex  text-foreground hover:underline"
+          <ul className="ml-6 mt-2 space-y-1">
+            {resource.label === "Notas"
+              ?
+                categories.map((category, k) => {
+                  const filteredPosts = posts.filter((a) => a.category === category)
+                  return (
+                    <li key={k}>
+                      <button
+                        onClick={() => toggleArticleCategory(category)}
+                        className="text-foreground hover:text-primary transition-colors font-normal cursor-pointer"
                       >
-                        {item.label}
-                      </a>
+                        {expandedArticleCategories.includes(category) ? "▼" : "▶"} {category}
+                      </button>
+
+                      {expandedArticleCategories.includes(category) && (
+                        <ul className="ml-6 mt-2 space-y-1">
+                          {filteredPosts.map((post, k) => (
+                            <li key={k}>
+                              <a href={`/posts/${post.slug}`} className="hover:underline">
+                                {post.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
-                  ))
-              }
-            </ul>
-          )}
+                  )
+                })
+              : 
+                resource.items.map((item) => (
+                  <li>
+                    <a
+                      key={item.label}
+                      href={item.url || "#"}
+                      target="_blank"
+                      className="flex text-foreground font-normal hover:underline"
+                    >
+                      {item.label}
+                    </a>
+                      <p className="text-muted-foreground text-sm">{item.description}</p>
+                  </li>
+                ))
+            }
+          </ul>
         </div>
       ))}
     </div>

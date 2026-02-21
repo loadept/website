@@ -6,7 +6,8 @@ export interface Post extends FrontMatter {
 
 export interface ResourceItem {
   label: string
-  href?: string
+  url: string
+  description: string
 }
 
 export interface Resources {
