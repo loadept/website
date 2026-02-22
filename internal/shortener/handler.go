@@ -16,6 +16,15 @@ import (
 	"github.com/loadept/website/internal/storage"
 )
 
+// local cache vars
+var (
+	cacheMu    sync.RWMutex
+	cache      = make(map[string]string)
+	httpClient = &http.Client{
+		Timeout: 10 * time.Second,
+	}
+)
+
 type shortHandler struct {
 	s  *storage.ShortURLStorage
 	sa *storage.AuthStorage
@@ -24,14 +33,6 @@ type shortHandler struct {
 func NewShortHandler(s *storage.ShortURLStorage, sa *storage.AuthStorage) *shortHandler {
 	return &shortHandler{s: s, sa: sa}
 }
-
-var (
-	cacheMu    sync.RWMutex
-	cache      = make(map[string]string)
-	httpClient = &http.Client{
-		Timeout: 10 * time.Second,
-	}
-)
 
 type logEntry struct {
 	Timestamp string `json:"timestamp"`
@@ -54,7 +55,7 @@ func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
 		Country:   r.Header.Get("CF-IPCountry"),
 		RayID:     r.Header.Get("CF-Ray"),
 	}
-	defer json.NewEncoder(os.Stdout).Encode(le)
+	defer writeLog(le)
 
 	ctx := r.Context()
 	shortCode := r.PathValue("code")
@@ -97,7 +98,7 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 		Country:   r.Header.Get("CF-IPCountry"),
 		RayID:     r.Header.Get("CF-Ray"),
 	}
-	defer json.NewEncoder(os.Stdout).Encode(le)
+	defer writeLog(le)
 
 	ctx := r.Context()
 	headerToken := r.Header.Get("Authorization")
@@ -225,6 +226,17 @@ func writeJSON(w http.ResponseWriter, response any, statusCode int) {
 	}
 	w.WriteHeader(statusCode)
 	w.Write(responseBytes)
+}
+
+var (
+	logMu  sync.Mutex
+	logEnc = json.NewEncoder(os.Stdout)
+)
+
+func writeLog(le *logEntry) {
+	logMu.Lock()
+	defer logMu.Unlock()
+	logEnc.Encode(le)
 }
 
 const base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
