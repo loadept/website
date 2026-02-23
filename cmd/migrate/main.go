@@ -9,19 +9,6 @@ import (
 )
 
 const schema = `
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    identifier TEXT NOT NULL UNIQUE,
-    github_id INTEGER NOT NULL UNIQUE,
-    github_login TEXT NOT NULL,
-    github_node_id TEXT NOT NULL,
-    status TEXT NOT NULL CHECK(status IN ('active', 'deleted')) DEFAULT 'active',
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TEXT 
-) STRICT;
-CREATE INDEX IF NOT EXISTS idx_users_identifier ON users(identifier);
-
 CREATE TABLE IF NOT EXISTS short_urls (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
