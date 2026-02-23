@@ -76,7 +76,7 @@ func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		http.Error(w, "500 internal error", http.StatusInternalServerError)
 		return
 	}
 	cacheMu.Lock()
@@ -101,12 +101,19 @@ func (h *shortHandler) CreateURL(w http.ResponseWriter, r *http.Request) {
 	defer writeLog(le)
 
 	ctx := r.Context()
-	headerToken := r.Header.Get("Authorization")
-	if !strings.HasPrefix(headerToken, "Bearer") {
+
+	ct := r.Header.Get("Content-Type")
+	if !strings.HasPrefix(ct, "application/json") {
+		writeJSON(w, m{"detail": "content-type must be application/json"}, http.StatusUnsupportedMediaType)
+		return
+	}
+
+	au := r.Header.Get("Authorization")
+	if !strings.HasPrefix(au, "Bearer") {
 		writeJSON(w, m{"detail": "invalid token format"}, http.StatusUnauthorized)
 		return
 	}
-	token := strings.TrimPrefix(headerToken, "Bearer ")
+	token := strings.TrimPrefix(au, "Bearer ")
 
 	req, err := http.NewRequestWithContext(
 		ctx,
@@ -229,14 +236,14 @@ func writeJSON(w http.ResponseWriter, response any, statusCode int) {
 }
 
 var (
-	logMu  sync.Mutex
-	logEnc = json.NewEncoder(os.Stdout)
+	logMu sync.Mutex
+	enc   = json.NewEncoder(os.Stdout)
 )
 
 func writeLog(le *logEntry) {
 	logMu.Lock()
 	defer logMu.Unlock()
-	logEnc.Encode(le)
+	enc.Encode(le)
 }
 
 const base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
