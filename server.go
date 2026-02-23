@@ -14,7 +14,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/loadept/website/internal/shortener"
+	"github.com/loadept/website/internal/short"
 	"github.com/loadept/website/internal/storage"
 	"zombiezen.com/go/sqlite"
 	"zombiezen.com/go/sqlite/sqlitex"
@@ -41,16 +41,14 @@ func main() {
 	mux := http.NewServeMux()
 	s, err := storage.NewShortURLStorage(pool)
 	fatalIfErr(err)
-	sa, err := storage.NewAuthStorage(pool)
-	fatalIfErr(err)
-	shortHandler := shortener.NewShortHandler(s, sa)
 
+	shortHandler := short.NewShortHandler(s)
 	subFS, err := fs.Sub(staticFiles, "web/static")
 	fatalIfErr(err)
+
 	staticFS := neuteredFS{fs: http.FS(subFS)}
 	mux.Handle("GET /", http.FileServer(staticFS))
 	mux.HandleFunc("GET /s/{code}", shortHandler.RedirectURL)
-	mux.HandleFunc("POST /s/shorten", shortHandler.CreateURL)
 
 	server := http.Server{
 		Addr:         getEnv("ADDR"),
