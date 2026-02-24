@@ -27,7 +27,7 @@ func main() {
 	log.SetFlags(0)
 
 	var db, name, url, code string
-	flag.StringVar(&db, "db", "", "Path to the SQLite database")
+	flag.StringVar(&db, "db", os.Getenv("DB_PATH"), "Path to the SQLite database (if not set, will use DB_PATH env var)")
 	flag.StringVar(&name, "n", "", "Name of short url")
 	flag.StringVar(&name, "name", "", "Name of short url")
 	flag.StringVar(&url, "u", "", "Original URL to shorten")
@@ -36,8 +36,14 @@ func main() {
 	flag.StringVar(&code, "code", "", "Custom short code (optional)")
 	flag.Parse()
 
-	if db == "" || name == "" || url == "" {
-		log.Fatal("db, name and url flags are required")
+	if db == "" {
+		log.Fatal("db path is required: use -db flag or set DB_PATH env var")
+	}
+	if name == "" {
+		log.Fatal("-name or -n flag is required")
+	}
+	if url == "" {
+		log.Fatal("-url or -u flag is required")
 	}
 
 	purl, err := netURL.ParseRequestURI(url)

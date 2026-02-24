@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"zombiezen.com/go/sqlite"
 	"zombiezen.com/go/sqlite/sqlitex"
@@ -31,17 +32,59 @@ ON short_urls(short_code) WHERE status = 'active';
 func main() {
 	log.SetFlags(0)
 
-	dbPath := flag.String("db", "db.sqlite3", "Path to the SQLite database")
+	var db string
+	var run, check bool
+	flag.StringVar(&db, "db", os.Getenv("DB_PATH"), "Path to the SQLite database")
+	flag.BoolVar(&run, "run", false, "")
+	flag.BoolVar(&check, "check", false, "")
 	flag.Parse()
 
-	conn, err := sqlite.OpenConn(*dbPath, sqlite.OpenReadWrite, sqlite.OpenCreate)
+	if db == "" {
+		log.Fatal("db path is required: use -db flag or set DB_PATH env var")
+	}
+	if run && check {
+		log.Fatal("use -run to apply migrations or -status to check schema")
+	}
+	if !run && !check {
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	conn, err := sqlite.OpenConn(db, sqlite.OpenReadWrite, sqlite.OpenCreate)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
-	if err := sqlitex.ExecuteScript(conn, schema, nil); err != nil {
-		log.Fatal(err)
+	if run {
+		if err := sqlitex.ExecuteScript(conn, schema, nil); err != nil {
+			log.Fatal("failed to apply schema:", err)
+		}
+
+		log.Println("migrations applied successfully")
+		return
 	}
-	log.Println("all migrations applied")
+	if check {
+		var found []string
+		if err := sqlitex.Execute(conn, `
+			SELECT name
+			FROM sqlite_master
+			WHERE tbl_name = 'short_urls'
+		`, &sqlitex.ExecOptions{
+			ResultFunc: func(stmt *sqlite.Stmt) error {
+				found = append(found, stmt.GetText("name"))
+				return nil
+			},
+		}); err != nil {
+			log.Fatal(err)
+		}
+
+		if len(found) == 0 {
+			log.Fatal("migrations not applied")
+		}
+
+		for _, name := range found {
+			log.Println("✓", name)
+		}
+	}
 }

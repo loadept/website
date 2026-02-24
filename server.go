@@ -78,7 +78,7 @@ func main() {
 func getEnv(key string) string {
 	value := os.Getenv(key)
 	if value == "" {
-		log.Fatalf("environment variable %s is required", key)
+		log.Fatalf("env var %s is required", key)
 	}
 	return value
 }
