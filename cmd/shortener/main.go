@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"encoding/json"
 	"flag"
 	"log"
 	"math/big"
@@ -15,13 +14,6 @@ import (
 )
 
 const base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-
-type ShortURL struct {
-	ID          int64  `json:"id,omitempty"`
-	Name        string `json:"name"`
-	OriginalURL string `json:"original_url"`
-	ShortCode   string `json:"short_code,omitempty"`
-}
 
 func main() {
 	log.SetFlags(0)
@@ -65,7 +57,7 @@ func main() {
 		}
 	} else {
 		var err error
-		code, err = generateBase62Code(6)
+		code, err = generateBase62Code(4)
 		if err != nil {
 			log.Fatalf("failed to generate short code: %v", err)
 		}
@@ -77,7 +69,6 @@ func main() {
 	}
 	defer conn.Close()
 
-	var short ShortURL
 	if err := sqlitex.Execute(conn, `
 		INSERT INTO short_urls(name, original_url, short_code)
 		VALUES ($1, $2, $3)
@@ -85,10 +76,13 @@ func main() {
 	`, &sqlitex.ExecOptions{
 		Named: map[string]any{"$1": name, "$2": url, "$3": code},
 		ResultFunc: func(stmt *sqlite.Stmt) error {
-			short.ID = stmt.GetInt64("id")
-			short.Name = stmt.GetText("name")
-			short.OriginalURL = stmt.GetText("original_url")
-			short.ShortCode = stmt.GetText("short_code")
+			log.Println("short url created successfully")
+			log.Printf("id=%d name=%s code=%s url=%s",
+				stmt.GetInt64("id"),
+				stmt.GetText("name"),
+				stmt.GetText("short_code"),
+				stmt.GetText("original_url"),
+			)
 			return nil
 		},
 	}); err != nil {
@@ -103,10 +97,6 @@ func main() {
 		}
 		log.Fatalf("failed to insert short url: %v", err)
 	}
-
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", " ")
-	enc.Encode(short)
 }
 
 func generateBase62Code(length int) (string, error) {

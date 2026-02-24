@@ -33,21 +33,16 @@ func main() {
 	log.SetFlags(0)
 
 	var db string
-	var run, check bool
+	var run bool
 	flag.StringVar(&db, "db", os.Getenv("DB_PATH"), "Path to the SQLite database")
-	flag.BoolVar(&run, "run", false, "")
-	flag.BoolVar(&check, "check", false, "")
+	flag.BoolVar(&run, "run", false, "Execute the schema for short URLs")
 	flag.Parse()
 
 	if db == "" {
 		log.Fatal("db path is required: use -db flag or set DB_PATH env var")
 	}
-	if run && check {
-		log.Fatal("use -run to apply migrations or -status to check schema")
-	}
-	if !run && !check {
-		flag.Usage()
-		os.Exit(1)
+	if !run {
+		log.Fatal("use -run to apply migrations")
 	}
 
 	conn, err := sqlite.OpenConn(db, sqlite.OpenReadWrite, sqlite.OpenCreate)
@@ -61,30 +56,6 @@ func main() {
 			log.Fatal("failed to apply schema:", err)
 		}
 
-		log.Println("migrations applied successfully")
-		return
-	}
-	if check {
-		var found []string
-		if err := sqlitex.Execute(conn, `
-			SELECT name
-			FROM sqlite_master
-			WHERE tbl_name = 'short_urls'
-		`, &sqlitex.ExecOptions{
-			ResultFunc: func(stmt *sqlite.Stmt) error {
-				found = append(found, stmt.GetText("name"))
-				return nil
-			},
-		}); err != nil {
-			log.Fatal(err)
-		}
-
-		if len(found) == 0 {
-			log.Fatal("migrations not applied")
-		}
-
-		for _, name := range found {
-			log.Println("✓", name)
-		}
+		log.Println("migrations applied successfully, no changes if already existed")
 	}
 }
