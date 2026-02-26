@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/loadept/website/internal/logger"
 	"github.com/loadept/website/internal/short"
 	"github.com/loadept/website/internal/storage"
 	"zombiezen.com/go/sqlite"
@@ -26,7 +27,16 @@ var staticFiles embed.FS
 func main() {
 	log.SetFlags(0)
 
-	pool, err := sqlitex.NewPool(getEnv("DB_PATH"), sqlitex.PoolOptions{
+	db := os.Getenv("DB_PATH")
+	if db == "" {
+		log.Fatalf("env var DB_PATH is required")
+	}
+	addr := os.Getenv("ADDR")
+	if addr == "" {
+		log.Fatalf("env var ADDR is required")
+	}
+
+	pool, err := sqlitex.NewPool(db, sqlitex.PoolOptions{
 		PoolSize: 3,
 		PrepareConn: func(conn *sqlite.Conn) error {
 			return sqlitex.ExecuteScript(conn, fmt.Sprintf(`
@@ -51,8 +61,8 @@ func main() {
 	mux.HandleFunc("GET /s/{code}", shortHandler.RedirectURL)
 
 	server := http.Server{
-		Addr:         getEnv("ADDR"),
-		Handler:      mux,
+		Addr:         addr,
+		Handler:      logger.Middleware(mux),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
@@ -73,14 +83,6 @@ func main() {
 
 	log.Println("shutting down server...")
 	fatalIfErr(server.Shutdown(shotdownCtx))
-}
-
-func getEnv(key string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		log.Fatalf("env var %s is required", key)
-	}
-	return value
 }
 
 func fatalIfErr(err error) {

@@ -1,13 +1,11 @@
 package short
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
-	"os"
 	"sync"
-	"time"
 
+	"github.com/loadept/website/internal/logger"
 	"github.com/loadept/website/internal/storage"
 )
 
@@ -15,8 +13,6 @@ import (
 var (
 	cacheMu sync.RWMutex
 	cache   = make(map[string]string)
-	logMu   sync.Mutex
-	enc     = json.NewEncoder(os.Stdout)
 )
 
 type shortHandler struct {
@@ -27,34 +23,9 @@ func NewShortHandler(s *storage.ShortURLStorage) *shortHandler {
 	return &shortHandler{s: s}
 }
 
-type logEntry struct {
-	Timestamp string `json:"timestamp"`
-	Method    string `json:"method,omitempty"`
-	Path      string `json:"path,omitempty"`
-	CacheHit  bool   `json:"cache_hit,omitempty"`
-	Error     string `json:"error,omitempty"`
-	Addr      string `json:"ip,omitempty"`
-	Country   string `json:"country,omitempty"`
-	RayID     string `json:"ray_id,omitempty"`
-}
-
-func newLogEntry(r *http.Request) *logEntry {
-	// log entry (addr will be obtained from headers set by Cloudflare)
-	return &logEntry{
-		Timestamp: time.Now().Format(time.RFC3339),
-		Method:    r.Method,
-		Path:      r.URL.Path,
-		Addr:      r.Header.Get("CF-Connecting-IP"),
-		Country:   r.Header.Get("CF-IPCountry"),
-		RayID:     r.Header.Get("CF-Ray"),
-	}
-}
-
 func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
-	le := newLogEntry(r)
-	defer writeLog(le)
 	ctx := r.Context()
-
+	le := logger.FromContext(ctx)
 	shortCode := r.PathValue("code")
 
 	cacheMu.RLock()
@@ -81,10 +52,4 @@ func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
 	cacheMu.Unlock()
 
 	http.Redirect(w, r, originalURL, http.StatusFound)
-}
-
-func writeLog(le *logEntry) {
-	logMu.Lock()
-	defer logMu.Unlock()
-	enc.Encode(le)
 }
