@@ -2,6 +2,7 @@ package short
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -39,7 +40,7 @@ func (h *shortHandler) RedirectURL(w http.ResponseWriter, r *http.Request) {
 
 	originalURL, err := h.s.GetURL(ctx, shortCode)
 	if err != nil {
-		le.Error = "failed to get URL from database: " + err.Error()
+		le.Error = fmt.Sprintf("failed to get URL from database: %v", err)
 		if errors.Is(err, storage.ErrShortURLNotFound) {
 			http.NotFound(w, r)
 			return
