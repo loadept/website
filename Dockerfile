@@ -7,7 +7,7 @@ RUN bun install --frozen-lockfile
 COPY web .
 RUN bun run build
 
-FROM golang:1.25-alpine3.23 AS compile
+FROM golang:1.26.0-alpine3.23 AS compile
 WORKDIR /usr/src/app
 ENV CGO_ENABLED=0
 COPY go.mod go.sum ./
