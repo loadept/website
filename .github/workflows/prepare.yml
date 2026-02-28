@@ -29,7 +29,7 @@ jobs:
             ./...
 
       - name: Publish test result
-        if: ${{ !canceled() }}
+        if: ${{ !cancelled() }}
         uses: dorny/test-reporter@v1
         with:
           name: Go Tests
