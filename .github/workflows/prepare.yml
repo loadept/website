@@ -26,7 +26,7 @@ jobs:
           gotestsum \
             --junitfile results.xml \
             --format testdox \
-            ./internal/...
+            ./...
 
       - name: Publish test result
         if: success() || failure()
