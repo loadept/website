@@ -1,7 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import FrontDate from '../../modules/posts/components/FrontDate.astro'
-import BackArrow from '../../modules/shared/components/BackArrow.astro'
 import type { FrontMatter } from '../../modules/shared/types/frontmatter'
 
 export const getStaticPaths = async () => {
@@ -32,7 +31,7 @@ const keywords = frontmatter.keywords!.join(', ')
   keywords={keywords}
 >
   <div class="container mx-auto px-4 max-w-3xl py-12">
-    <BackArrow text="Volver al inicio" href="/" />
+    <!-- <BackArrow text="Volver al inicio" href="/" /> -->
     <article class="
       prose
       dark:prose-invert

@@ -1,6 +1,6 @@
 ---
 title: Dockerización en Go
-date: 2025-06-09
+date: 2026-03-05
 keywords: [binario, go, golang, programacion, development, docker]
 category: Go-lang
 ---
@@ -191,7 +191,7 @@ ENTRYPOINT [ "./main" ]
 ```
 
 ### Resultado
-![Pasted image 20250108015147](https://github.com/user-attachments/assets/40081688-fe47-460f-8f6b-abbf3f103615)
+![docker no alpine](https://assets.loadept.com/p/docker-no-alpine.png)
 
 >En este ejemplo se muestra un archivo `Dockerfile` mal optimizado, no hace uso de [versiones ligeras como alpine](#qué-imagen-usar) o [copiado de archivos de dependencias por separado](#copiando-de-dependencias-por-separado), ya que hace uso de un solo `COPY . .` para copiar directamente los archivos de dependencias y el código fuente y la falta de uso múltiples etapas de construcción, lo que podría traer consecuencias negativas a la hora de la construcción como tiempos muy exagerados o imágenes muy pesadas, como en este caso, donde la imagen llega a pesar **1.08GB**.
 
@@ -221,7 +221,7 @@ ENTRYPOINT [ "./main" ]
 ```
 
 ### Resultado
-![Pasted image 20250108015742](https://github.com/user-attachments/assets/5f7cfc33-4719-4057-9f50-2d3e832e321d)
+![docker alpine](https://assets.loadept.com/p/docker-alpine.png)
 
 >Este es el ejemplo que realizamos utilizando las mejores prácticas de optimización y construcción, haciendo uso correcto de la caché de **Docker**, multiples etapas de construcción y versiones ligeras de imágenes, lo que se ve reflejado en el tamaño de imagen y tiempo de construcción.
 

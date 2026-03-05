@@ -1,6 +1,6 @@
 ---
 title: Concurrencia en Go - Canales y Select en Acción
-date: 2025-03-10
+date: 2026-03-05
 keywords: [Go, Concurrencia, Canales, Select]
 category: Go-lang
 ---
@@ -8,7 +8,7 @@ category: Go-lang
 Un canal es un tipo de dato en **Go**, que se usa para comunicar **goroutines**. Es un tipo de dato primitivo del lenguaje, al igual que `slice`, `array` o `map`.
 
 Su propio nombre lo dice, es un canal o "tubería" por donde la información pasa de una **goroutine** a otra. Se pueden enviar o recibir valores de un tipo específico, porque los canales necesitan ser de un tipo de dato, ya sea `int`, `string`, etc.
-![go-channel](https://github.com/user-attachments/assets/2546f49a-144f-4076-b4f8-a4626cf51b13)
+![go-channel](https://assets.loadept.com/p/go-channel.svg)
 
 ## Introducción al uso de canales
 Para trabajar con canales existe el nombre `chan`, que representa este tipo de dato.
@@ -55,9 +55,9 @@ main.main()
 	/home/user/Golang/channels.go:10 +0x2d
 exit status 2
 ```
-![go-no-receptor-channel](https://github.com/user-attachments/assets/3442da60-5e67-4462-be8b-240dccde1f02)
-![arrow](https://github.com/user-attachments/assets/b38c86b1-9238-47aa-bf9f-3d166e931bb0)
-![go-lock-channel](https://github.com/user-attachments/assets/ded68c16-94ef-4afd-9f39-c1aa12231a0f)
+![go-no-receptor-channel](https://assets.loadept.com/p/go-no-receptor-channel.svg)
+![arrow](https://assets.loadept.com/p/arrow.svg)
+![go-lock-channel](https://assets.loadept.com/p/go-lock-channel.svg)
 Por defecto, los canales se crean sin buffer. Esto significa que necesitan que el receptor y el emisor estén sincronizados.
 ### Canales con buffer
 Si queremos que un canal pueda almacenar valores temporalmente sin bloquearse, podemos asignarle un buffer:
@@ -75,11 +75,11 @@ func main() {
 }
 ```
 Aquí, usamos `make` para crear un canal con un buffer con capacidad para 4 valores. Ahora el canal puede guardar los datos temporalmente hasta que alguien los reciba.
-![go-capacity-channel](https://github.com/user-attachments/assets/56e97802-ccca-4f70-b7d4-53bf89864246)
+![go-capacity-channel](https://assets.loadept.com/p/go-capacity-channel.svg)
 ## ¿Cómo empezar a trabajar con canales?
 Para trabajar con canales, usamos el operador `<-`. Este operador es intuitivo:
-- Si el canal está **antes** del operador, como en `<-myChannel`, significa que estamos extrayendo datos del canal.
-- Si el canal está **después**, como en `myChannel <- 3`, significa que estamos enviando datos al canal.
+- Si el operador está a la **izquierda** del canal, como en `<-myChannel`, significa que estamos extrayendo datos del canal como: `num := <-myChannel`.
+- Si el operador está a la **derecha**, como en `myChannel <-`, significa que estamos enviando datos al canal como: `myChannel <- 3`.
 
 Ejemplo:
 ```go
