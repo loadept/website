@@ -32,7 +32,7 @@ func main() {
 Acabamos de crear un canal (`myChannel`) de tipo entero (`int`). Este canal está diseñado para enviar y recibir datos de inmediato, ya que no tiene **buffer**.
 ## ¿Qué es un canal con o sin buffer?
 ### Canales sin buffer
-Un canal sin buffer necesita que un receptor esté listo para recibir los datos que se envían, y viceversa. Si no hay un receptor o emisor disponible, la goroutine se bloqueará, impidiendo que el programa avance. En casos donde haya una goroutine (`main`) o más, que donde estén intentado enviar/recibir datos sin emisor/receptor disponible se producirá un `panic deadlock`. Veamos un ejemplo:
+Un canal sin buffer necesita que un receptor esté listo para recibir los datos que se envían, y viceversa. Si no hay un receptor o emisor disponible, la goroutine se bloqueará, impidiendo que el programa avance. En casos donde haya una goroutine o más, que estén intentado enviar/recibir datos sin emisor/receptor disponible se producirá un `panic deadlock`. Veamos un ejemplo:
 ```go
 package main
 

@@ -17,9 +17,21 @@ jobs:
         with:
           go-version: '1.26.0'
 
+      - name: Get gofumpt
+        run: |
+          go install mvdan.cc/gofumpt@latest
       - name: Get gotestsum
         run: |
           go install gotest.tools/gotestsum@latest
+
+      - name: Check format
+        run: |
+          files=$(gofumpt -l .)
+          if [ -n "$file" ]; then
+            gofumpt -d $files
+          else
+            echo "everything is in order!"
+          fi
 
       - name: Run tests
         run: |
