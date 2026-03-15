@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"syscall"
 	"time"
 
@@ -56,8 +57,7 @@ func main() {
 	subFS, err := fs.Sub(staticFiles, "web/static")
 	fatalIfErr(err)
 
-	staticFS := neuteredFS{fs: http.FS(subFS)}
-	mux.Handle("GET /", http.FileServer(staticFS))
+	mux.Handle("GET /", http.FileServerFS(&neuteredFS{fs: subFS}))
 	mux.HandleFunc("GET /s/{code}", shortHandler.RedirectURL)
 
 	server := http.Server{
@@ -92,9 +92,14 @@ func fatalIfErr(err error) {
 }
 
 // FileServer Wrapper
-type neuteredFS struct{ fs http.FileSystem }
+type neuteredFS struct{ fs fs.FS }
 
-func (n neuteredFS) Open(name string) (http.File, error) {
+func (n *neuteredFS) Open(name string) (fs.File, error) {
+	name = strings.TrimPrefix(name, "/")
+	if name == "" {
+		name = "."
+	}
+
 	f, err := n.fs.Open(name)
 	if err != nil {
 		return nil, err
@@ -102,23 +107,13 @@ func (n neuteredFS) Open(name string) (http.File, error) {
 
 	stat, err := f.Stat()
 	if err != nil {
-		if errClose := f.Close(); errClose != nil {
-			return nil, errors.Join(err, errClose)
-		}
-		return nil, err
+		return nil, errors.Join(err, f.Close())
 	}
 
 	if stat.IsDir() {
-		index := path.Join(name, "index.html")
-		indexFile, err := n.fs.Open(index)
+		_, err := fs.Stat(n.fs, path.Join(name, "index.html"))
 		if err != nil {
-			if errClose := f.Close(); errClose != nil {
-				return nil, errors.Join(err, errClose)
-			}
-			return nil, fs.ErrNotExist
-		}
-		if errClose := indexFile.Close(); errClose != nil {
-			return nil, errors.Join(err, errClose)
+			return nil, errors.Join(fs.ErrNotExist, f.Close())
 		}
 	}
 
