@@ -11,6 +11,12 @@ export interface ResourceItem {
 }
 
 export interface Resources {
-  label: string
+  name: string
   items: ResourceItem[]
+}
+
+export interface ContactLink {
+  label: string
+  text: string
+  url: string
 }

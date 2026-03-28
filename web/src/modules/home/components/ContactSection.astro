@@ -1,39 +1,28 @@
 ---
-import { Mail } from "lucide-preact"
+import type { ContactLink } from "../types/home"
+
+interface Props {
+  links: ContactLink[]
+}
+
+const { links } = Astro.props
 ---
 
 <section class="mb-16">        
   <h2 class="flex items-center text-2xl font-bold mb-6 border-b border-border pb-3">
-    <Mail class="w-5 h-5 mr-2" />
     Contacto
   </h2>
   <p class="text-base leading-relaxed mb-4">
     ¿Tienes preguntas o quieres colaborar? No dudes en contactarme.
   </p>
   <ul class="space-y-2">
-    <li>
-      <strong>Email:</strong>{" "}
-      <a href="mailto:loadept3@gmail.com" class="text-primary hover:underline">
-        loadept3@gmail.com
-      </a>
-    </li>
-    <li>
-      <strong>GitHub:</strong>{" "}
-      <a href="https://loadept.com/s/gh" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-        Loadept
-      </a>
-    </li>
-    <li>
-      <strong>LinkedIn:</strong>{" "}
-      <a href="https://loadept.com/s/linkedin" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-        Jesus Machaca Hancco
-      </a>
-    </li>
-    <li>
-      <strong>Tiktok:</strong>{" "}
-      <a href="https://loadept.com/s/tiktok" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-        @loadept
-      </a>
-    </li>
+    {links.map(link => (
+      <li>
+        <strong>{link.label}:</strong>{" "}
+        <a href={link.url} target="_blank" class="text-primary hover:underline">
+          {link.text}
+        </a>
+      </li>
+    ))}
   </ul>
 </section>

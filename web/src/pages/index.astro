@@ -2,12 +2,13 @@
 import Layout from '../layouts/Layout.astro'
 import Intro from '../modules/home/components/intro.astro'
 import { Content } from '../modules/home/components/Content'
-import type { Resources } from '../modules/home/types/home'
+import type { Post, Resources, ContactLink } from '../modules/home/types/home'
 import type { FrontMatter } from '../modules/shared/types/frontmatter'
 import ContactSection from '../modules/home/components/ContactSection.astro'
 
 const allPosts = import.meta.glob('../content/posts/**/*.md', { eager: true })
-const posts = Object.entries(allPosts).map(([filePath, post]: [string, any]) => {
+const posts: Post[] = Object.entries(allPosts)
+  .map(([filePath, post]: [string, any]) => {
   const slug = filePath.replace('../content/posts/', '').replace('.md', '').trim()
 	const frontmatter: FrontMatter = post.frontmatter
 
@@ -24,7 +25,7 @@ const categories: string[] = Array.from(
 
 const resources: Resources[] = [
 	{
-		label: "Software",
+		name: "Software",
 		items: [
 			{
 				label: "db-mcp",
@@ -44,15 +45,38 @@ const resources: Resources[] = [
 		],
 	},
   {
-    label: "Notas",
+    name: "Notas",
     items: []
   }
+]
+
+const links: ContactLink = [
+  {
+    label: "Email",
+    text: "hi@loadept.com",
+    url: "mailto:hi@loadept.com?subject=Hi Loadept!",
+  },
+  {
+    label: "Github",
+    text: "Loadept",
+    url: "https://loadept.com/s/gh",
+  },
+  {
+    label: "Linkedin",
+    text: "Jesus Gonzalo Machaca Hancco",
+    url: "https://loadept.com/s/linkedin",
+  },
+  {
+    label: "Tiktok",
+    text: "@loadept",
+    url: "https://loadept.com/s/tiktok",
+  },
 ]
 ---
 
 <Layout 
 	title="loadept"
-	description="Sitio web personal, comparto notas y recursos relacionados con el desarrollo de software :) ."
+	description="Mi sitio web personal, comparto notas y recursos relacionados con el desarrollo de software :) ."
 	keywords="notas, go, linux, backend, devops, software development"
 >
 	<div class="max-w-2xl mx-auto px-6 py-12">
@@ -63,6 +87,6 @@ const resources: Resources[] = [
 			posts={posts}
 			resources={resources}
 		/>
-		<ContactSection />
+		<ContactSection links={links} />
 	</div>
 </Layout>

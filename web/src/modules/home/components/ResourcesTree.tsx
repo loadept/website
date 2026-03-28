@@ -16,13 +16,13 @@ export const ResourcesTree = (
   return (
     <div className="space-y-4">
       {resources.map((resource) => (
-        <div key={resource.label}>
+        <div key={resource.name}>
           <h2 className="text-primary font-normal text-lg">
-            {resource.label}
+            {resource.name}
           </h2>
 
           <ul className="ml-6 mt-2 space-y-1">
-            {resource.label === "Notas"
+            {resource.name === "Notas"
               ?
                 categories.map((category, k) => {
                   const filteredPosts = posts.filter((a) => a.category === category)

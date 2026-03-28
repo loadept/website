@@ -4,7 +4,7 @@ const formatDate = (utcDate: string, format: string) => {
       return new Date(utcDate).toLocaleString('es-PE', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: '2-digit'
       })
     case "numeric":
       return new Date(utcDate).toLocaleString('es-PE', {
@@ -14,7 +14,7 @@ const formatDate = (utcDate: string, format: string) => {
       })
     default:
       return new Date(utcDate).toLocaleDateString()
-}
+  }
 }
 
 export default formatDate
