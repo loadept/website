@@ -9,7 +9,7 @@ updates:
       - dependencies
       - go
 
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: /web
     schedule:
       interval: weekly
