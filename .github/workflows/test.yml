@@ -1,9 +1,16 @@
-name: Prepare project
+name: Test Project
 
 on:
   push:
     branches:
       - master
+    paths-ignore:
+      - README.md
+      - LICENSE
+      - AGENTS.md
+      - docs/**
+      - .gitignore
+      - .dockerignore
 
 jobs:
   test:
