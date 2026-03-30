@@ -16,7 +16,7 @@
     "@astrojs/sitemap": "3.6.0",
     "@tailwindcss/vite": "4.1.17",
     "astro": "5.16.2",
-    "axios": "1.13.2",
+    "axios": "1.14.0",
     "lucide-preact": "0.555.0",
     "preact": "10.27.2",
     "tailwindcss": "4.1.17"
