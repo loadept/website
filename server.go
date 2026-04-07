@@ -48,6 +48,7 @@ func main() {
 		},
 	})
 	fatalIfErr(err)
+	defer pool.Close()
 
 	mux := http.NewServeMux()
 	s, err := storage.NewShortURLStorage(pool)
