@@ -4,7 +4,6 @@ import (
 	"context"
 	"embed"
 	"errors"
-	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
@@ -40,11 +39,11 @@ func main() {
 	pool, err := sqlitex.NewPool(db, sqlitex.PoolOptions{
 		PoolSize: 3,
 		PrepareConn: func(conn *sqlite.Conn) error {
-			return sqlitex.ExecuteScript(conn, fmt.Sprintf(`
+			return sqlitex.ExecuteScript(conn, `
 				PRAGMA foreign_keys = ON;
-				PRAGMA busy_timeout = %d;
+				PRAGMA busy_timeout = 5000;
 				PRAGMA journal_mode = WAL;
-			`, 5000), nil)
+			`, nil)
 		},
 	})
 	fatalIfErr(err)
@@ -79,11 +78,11 @@ func main() {
 	defer stop()
 	<-ctx.Done()
 
-	shotdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	log.Println("shutting down server...")
-	fatalIfErr(server.Shutdown(shotdownCtx))
+	fatalIfErr(server.Shutdown(shutdownCtx))
 }
 
 func fatalIfErr(err error) {
