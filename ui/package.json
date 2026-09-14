@@ -16,7 +16,7 @@
     "@astrojs/sitemap": "3.7.3",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.2.9",
-    "lucide-preact": "1.35.0",
+    "lucide-preact": "1.45.0",
     "preact": "10.29.8",
     "tailwindcss": "4.3.3"
   },
