@@ -9,7 +9,7 @@
         "@astrojs/sitemap": "3.7.3",
         "@tailwindcss/vite": "4.3.3",
         "astro": "7.2.9",
-        "lucide-preact": "1.35.0",
+        "lucide-preact": "1.47.0",
         "preact": "10.29.8",
         "tailwindcss": "4.3.3",
       },
@@ -707,7 +707,7 @@
 
     "lru-cache": ["lru-cache@11.5.2", "", {}, "sha512-4pfM1Ff0x50o0tQwb5ucw/RzNyD0/YJME6IVcStalZuMWxdt3sR3huStTtxz4PUmvZfRguvDejasvQ2kifR11g=="],
 
-    "lucide-preact": ["lucide-preact@1.35.0", "", { "peerDependencies": { "preact": "^10.27.2" } }, "sha512-psq9NqIPV6G3uFrVRvDV6tCE/mD8gX9URxtzCzxVxFcl3Pv6h8QEZHwh7KyubapiwCgOnLkNYlgJwzkIuW5GUg=="],
+    "lucide-preact": ["lucide-preact@1.47.0", "", { "peerDependencies": { "preact": "^10.27.2" } }, "sha512-ihver2SariDZA1n/JESxDEe5uhQ+K8YL6wiozAOLreJxoQn+aEeEpJ9rO03+I76crhS2YefiE6sM8dUmgJh7/w=="],
 
     "magic-string": ["magic-string@1.2.2", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-veT/+7iXrXzT39XnEN4lOxtNl72dMgJ8Lp+5Bd6YcMSWpb0n0MjBM8Uuooi6jgJr8dhUW2swQgBmoZVMni5SVg=="],
 
