@@ -17,8 +17,8 @@ const {
 	type = 'website',
 } = Astro.props
 
-const image = 'https://loadept.com/images/draw.webp'
-const canonicalURL = new URL(Astro.url.pathname, 'https://loadept.com')
+const image = new URL('/images/draw.webp', Astro.site)
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 ---
 
 <!doctype html>
@@ -63,7 +63,7 @@ const canonicalURL = new URL(Astro.url.pathname, 'https://loadept.com')
 
 		<link rel="icon" href="/favicon.ico" sizes="any" />
 		<link rel="canonical" href={canonicalURL} />
-  		<link rel="sitemap" href="/sitemap-index.xml" />
+  	<link rel="sitemap" href="/sitemap-index.xml" />
 		<slot name="head" />
 		<script is:inline>
 			(() => {

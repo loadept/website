@@ -20,8 +20,8 @@ const { Content } = await render(post)
 const { title, date, updated, keywords } = post.data
 
 const description = `Mis notas sobre ${title}.`
-const image = 'https://loadept.com/images/draw.webp'
-const canonicalURL = new URL(Astro.url.pathname, 'https://loadept.com')
+const image = new URL('/images/draw.webp', Astro.site)
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -35,7 +35,7 @@ const jsonLd = {
   author: {
     '@type': 'Person',
     name: 'Jesus Gonzalo Machaca Hancco',
-    url: 'https://loadept.com',
+    url: canonicalURL.origin,
   },
   mainEntityOfPage: canonicalURL.href,
 }

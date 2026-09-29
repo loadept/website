@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/joho/godotenv"
+	"github.com/loadept/website/internal/gopackages"
 	"github.com/loadept/website/internal/middleware"
 	"github.com/loadept/website/internal/short"
 	"github.com/loadept/website/ui"
@@ -25,13 +27,19 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
+	_ = godotenv.Overload()
+
 	db := os.Getenv("DB_PATH")
 	addr := os.Getenv("ADDR")
+	githubUser := os.Getenv("GITHUB_USER")
 	if db == "" {
 		log.Fatalf("env var DB_PATH is required")
 	}
 	if addr == "" {
 		log.Fatalf("env var ADDR is required")
+	}
+	if githubUser == "" {
+		log.Fatalf("env var GITHUB_USER is required")
 	}
 
 	pool, err := sqlitex.NewPool(db, sqlitex.PoolOptions{
@@ -51,9 +59,11 @@ func main() {
 	r.Use(middleware.Logger)
 
 	shortHandler := short.NewHandler(short.NewRepo(pool))
+	goPkg := gopackages.NewHandler(githubUser)
 
 	fileServ := http.FileServerFS(ui.FS)
 	r.Get("/s/{code}", shortHandler.RedirectURL)
+	r.Get("/go/{pkg}", goPkg.ServePkg)
 	r.Get("/*", func(w http.ResponseWriter, r *http.Request) { fileServ.ServeHTTP(w, r) })
 
 	server := http.Server{
