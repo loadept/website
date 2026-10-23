@@ -2,105 +2,171 @@ package config_test
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/loadept/website/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
-const yamlContent = `config:
-  debug_mode: true
-  app:
-    name: example
-    static_files: web/static
-  http:
-    addr: :8080
-    read_timeout_seconds: 5
-    write_timeout_seconds: 10
-    idle_timeout_seconds: 120
-  https:
-    addr: :4433
-    cert_file: cert.pem
-    key_file: key.pem
-    read_timeout_seconds: 5
-    write_timeout_seconds: 10
-    idle_timeout_seconds: 120
-  database:
-    migrations_path: ./migrations
-    db_path: db.sqlite3
-    pool_size: 3
-    busy_timeout: 5000
-`
+const testEnvKey = "CONFIG_TEST_KEY"
 
-func TestLoadConfig_File(t *testing.T) {
-	tmpDir := t.TempDir()
-	file := filepath.Join(tmpDir, "config.yaml")
-	fatalIfErr(t, os.WriteFile(file, []byte(yamlContent), 0o600))
-
-	tests := []struct {
-		name    string
-		file    string
-		wantErr bool
-	}{
-		{"exist file", file, false},
-		{"non exist file", filepath.Join(tmpDir, "nonexist.yaml"), true},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.file)
-
-			if tt.wantErr {
-				assert.Error(t, err)
-				assert.ErrorIs(t, err, os.ErrNotExist)
+func unsetEnv(t *testing.T, keys ...string) {
+	t.Helper()
+	for _, k := range keys {
+		prev, had := os.LookupEnv(k)
+		os.Unsetenv(k)
+		t.Cleanup(func() {
+			if had {
+				os.Setenv(k, prev)
 			} else {
-				assert.NoError(t, err)
-				assert.IsType(t, &config.Config{}, cfg)
-				assert.Equal(t, cfg.App.Name, "example")
+				os.Unsetenv(k)
 			}
 		})
 	}
 }
 
-func TestLoadConfig_Extensions(t *testing.T) {
-	tmpDir := t.TempDir()
-	yamlFile := filepath.Join(tmpDir, "config.yaml")
-	ymlFile := filepath.Join(tmpDir, "config.yml")
-	fatalIfErr(t, os.WriteFile(yamlFile, []byte(yamlContent), 0o600))
-	fatalIfErr(t, os.WriteFile(ymlFile, []byte(yamlContent), 0o600))
+func clearEnv(t *testing.T) {
+	t.Helper()
+	unsetEnv(t, "ADDR", "APP_URL", "DB_PATH", "GITHUB_URL")
+}
 
-	txtFile := filepath.Join(tmpDir, "config.txt")
-	fatalIfErr(t, os.WriteFile(txtFile, []byte("txt content"), 0o600))
+func setEnv(t *testing.T, key, value string) {
+	t.Helper()
+	t.Setenv(key, value)
+}
 
+func validEnv() map[string]string {
+	return map[string]string{
+		"ADDR":       "127.0.0.1:8080",
+		"APP_URL":    "http://localhost:8080",
+		"DB_PATH":    "test.db",
+		"GITHUB_URL": "https://github.com/example",
+	}
+}
+
+func TestLoad_Defaults(t *testing.T) {
+	clearEnv(t)
+	setEnv(t, "DB_PATH", "test.db")
+	setEnv(t, "GITHUB_URL", "https://github.com/example")
+
+	cfg, err := config.Load()
+	if !assert.NoError(t, err) || !assert.NotNil(t, cfg) {
+		return
+	}
+	assert.Equal(t, "127.0.0.1:8080", cfg.Addr)
+	assert.Equal(t, "http://localhost:8080", cfg.AppURL)
+	assert.Equal(t, "test.db", cfg.DBPath)
+	assert.Equal(t, "https://github.com/example", cfg.GithubURL)
+}
+
+func TestLoad_FromEnv(t *testing.T) {
+	clearEnv(t)
+	setEnv(t, "ADDR", ":9090")
+	setEnv(t, "APP_URL", "https://example.com")
+	setEnv(t, "DB_PATH", "/var/data/app.db")
+	setEnv(t, "GITHUB_URL", "https://github.com/loadept")
+
+	cfg, err := config.Load()
+	if !assert.NoError(t, err) || !assert.NotNil(t, cfg) {
+		return
+	}
+	assert.Equal(t, ":9090", cfg.Addr)
+	assert.Equal(t, "https://example.com", cfg.AppURL)
+	assert.Equal(t, "/var/data/app.db", cfg.DBPath)
+	assert.Equal(t, "https://github.com/loadept", cfg.GithubURL)
+}
+
+func TestLoad_Errors(t *testing.T) {
 	tests := []struct {
 		name    string
-		file    string
-		wantErr bool
+		set     map[string]string
+		drop    []string
+		wantErr string
 	}{
-		{"valid yaml", yamlFile, false},
-		{"valid yml", ymlFile, false},
-		{"invalid txt", txtFile, true},
+		{
+			name:    "addr_without_port",
+			set:     map[string]string{"ADDR": "localhost"},
+			wantErr: "env var ADDR is invalid",
+		},
+		{
+			name:    "app_url_without_scheme",
+			set:     map[string]string{"APP_URL": "not-a-url"},
+			wantErr: "env var APP_URL is invalid",
+		},
+		{
+			name:    "app_url_without_host",
+			set:     map[string]string{"APP_URL": "http://"},
+			wantErr: "env var APP_URL is invalid",
+		},
+		{
+			name:    "db_path_missing",
+			drop:    []string{"DB_PATH"},
+			wantErr: "env var DB_PATH is required",
+		},
+		{
+			name:    "db_path_empty",
+			set:     map[string]string{"DB_PATH": ""},
+			wantErr: "env var DB_PATH is required",
+		},
+		{
+			name:    "github_url_missing",
+			drop:    []string{"GITHUB_URL"},
+			wantErr: "env var GITHUB_URL is required",
+		},
+		{
+			name:    "github_url_without_scheme",
+			set:     map[string]string{"GITHUB_URL": "foo"},
+			wantErr: "env var GITHUB_URL is invalid",
+		},
+		{
+			name:    "github_url_without_host",
+			set:     map[string]string{"GITHUB_URL": "http://"},
+			wantErr: "env var GITHUB_URL is invalid",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := config.Load(tt.file)
-
-			if tt.wantErr {
-				assert.Error(t, err)
-				assert.ErrorIs(t, err, config.ErrFileNoYaml)
-			} else {
-				assert.NoError(t, err)
-				assert.IsType(t, &config.Config{}, cfg)
-				assert.Equal(t, cfg.App.Name, "example")
+			clearEnv(t)
+			env := validEnv()
+			for _, k := range tt.drop {
+				delete(env, k)
 			}
+			for k, v := range tt.set {
+				env[k] = v
+			}
+			for k, v := range env {
+				setEnv(t, k, v)
+			}
+
+			cfg, err := config.Load()
+			assert.EqualError(t, err, tt.wantErr)
+			assert.Nil(t, cfg)
 		})
 	}
 }
 
-func fatalIfErr(t *testing.T, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestEnv_ReturnsValueWhenSet(t *testing.T) {
+	setEnv(t, testEnvKey, "valor")
+	assert.Equal(t, "valor", config.Env(testEnvKey))
+}
+
+func TestEnv_ReturnsDefaultWhenUnset(t *testing.T) {
+	unsetEnv(t, testEnvKey)
+	assert.Equal(t, "fallback", config.Env(testEnvKey, "fallback"))
+}
+
+func TestEnv_ReturnsLastDefault(t *testing.T) {
+	unsetEnv(t, testEnvKey)
+	assert.Equal(t, "segundo", config.Env(testEnvKey, "primero", "segundo"))
+}
+
+func TestEnv_EmptyWhenUnsetAndNoDefault(t *testing.T) {
+	unsetEnv(t, testEnvKey)
+	assert.Equal(t, "", config.Env(testEnvKey))
+}
+
+func TestEnv_SetEmptyValueIgnoresDefault(t *testing.T) {
+	setEnv(t, testEnvKey, "")
+	assert.Equal(t, "", config.Env(testEnvKey, "fallback"))
 }

@@ -1,19 +1,9 @@
-FROM oven/bun:1.3.5 AS bun
-WORKDIR /usr/src/app
-
-FROM bun AS statics
-COPY ui/package.json ui/bun.lock ./
-RUN bun install --frozen-lockfile
-COPY ui .
-RUN bun run build
-
 FROM golang:1.26-alpine3.23 AS compile
 WORKDIR /usr/src/app
 ENV CGO_ENABLED=0
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-COPY --from=statics /usr/src/app/dist ui/dist
 RUN go build -trimpath -o server
 RUN go build -trimpath -o migrate ./cmd/migrate
 RUN go build -trimpath -o shortener ./cmd/shortener

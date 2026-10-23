@@ -1,0 +1,211 @@
+package template
+
+import "time"
+
+type Props struct {
+	Title string
+	Description string
+	Image string
+	Canonical string
+	Software []Links
+	Links []Links
+}
+
+type Links struct{
+	Label string
+	Text string
+	URL string
+}
+
+var currentYear = time.Now().Year()
+
+templ Layout(props Props) {
+	<!doctype html>
+	<html lang="es">
+		<head>
+			<meta charset="UTF-8" />
+			<title>{ props.Title }</title>
+
+			<link
+				rel="preload"
+				href="/static/fonts/firacode-subset.woff2"
+				as="font"
+				type="font/woff2"
+				crossorigin="anonymous"
+			/>
+
+			<link
+				rel="preload"
+				href="/static/images/draw.webp"
+				as="image"
+				type="image/webp"
+			/>
+
+			<meta name="viewport" content="width=device-width" />
+			<meta name="description" content={ props.Description }>
+
+			<meta property="og:title" content={ props.Title } />
+			<meta property="og:description" content={ props.Description } />
+			<meta property="og:image" content={ props.Image }>
+			<meta property="og:url" content={ props.Canonical }>
+			<meta property="og:type" content="website" />
+			<meta property="og:locale" content="es_PE">
+			<meta name="theme-color" content="#1f2329" />
+
+			<link rel="icon" href="/static/images/favicon.ico" sizes="any" />
+			<link rel="canonical" href={ props.Canonical } />
+        	<link rel="stylesheet" href="/static/css/global.min.css">
+			<script>
+				(() => {
+					const theme = localStorage.getItem("theme") || "dark"
+					document.documentElement.classList.toggle("dark", theme === "dark")
+				})()
+			</script>
+		</head>
+		<body class="min-h-screen bg-background text-foreground flex flex-col">
+			@Header()
+			{ children... }
+			@Footer()
+			<script type="module">
+				document.addEventListener("DOMContentLoaded", () => {
+				    document.getElementById("toggle-theme").addEventListener("click", () => {
+						const dark = document.documentElement.classList.toggle("dark")
+						localStorage.setItem("theme", dark ? "dark" : "light")
+					})
+				})
+			</script>
+		</body>
+	</html>
+}
+
+templ Header() {
+	<header class="py-6 top-0 z-50">
+		<div class="max-w-2xl mx-auto px-6">
+			<div class="flex items-center justify-between">
+				<a href="/" class="flex items-center gap-4 hover:opacity-80 transition-opacity">
+					<div class="w-12 h-12 shrink-0 overflow-hidden border border-border rounded-full">
+						<img src="/static/images/draw.webp" alt="logo" class="w-full h-full object-cover" />
+					</div>
+					<span class="text-2xl font-bold">loadept</span>
+				</a>
+				<div class="flex items-center">
+					<button
+						id="toggle-theme"
+						class="text-primary hover:text-accent flex items-center gap-2 transition-colors mx-6 cursor-pointer"
+						aria-label="toggle theme"
+						title="toggle theme"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 dark:hidden" aria-hidden="true">
+							<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path>
+						</svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden h-4 w-4 dark:block" aria-hidden="true">
+							<circle cx="12" cy="12" r="4"></circle>
+							<path d="M12 2v2"></path>
+							<path d="M12 20v2"></path>
+							<path d="m4.93 4.93 1.41 1.41"></path>
+							<path d="m17.66 17.66 1.41 1.41"></path>
+							<path d="M2 12h2"></path>
+							<path d="M20 12h2"></path>
+							<path d="m6.34 17.66-1.41 1.41"></path>
+							<path d="m19.07 4.93-1.41 1.41"></path>
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+	</header>
+}
+
+templ Footer() {
+	<footer class="py-8 mt-16">
+		<div class="max-w-2xl mx-auto px-4">
+			<div class="flex items-center justify-between text-center">
+				<p class="text-xs text-muted-foreground">
+					loadept <span class="text-[#e06c75]">-</span> { currentYear }
+				</p>
+				<a href="https://loadept.com/s/lwP9" target="_blank" title="source code" class="text-xs">
+					<span class="outline-none text-primary hover:text-accent">Código fuente</span>
+				</a>
+			</div>
+		</div>
+	</footer>
+}
+
+templ AboutSection() {
+	<section class="mb-16 space-y-4">
+		<p class="text-base leading-relaxed">
+		    Mi nombre Jesus Gonzalo Machaca Hancco,
+		    tengo { currentYear - 2003 } años y vivo en <strong class="font-extrabold">Perú</strong>.
+		    Soy desarrollador de software <strong class="font-extrabold">backend</strong>
+		    y me encanta el software libre y el open source.
+		    Paso la mayor parte del tiempo diseñando y construyendo software,
+		    casi siempre con música de fondo, sobre todo <strong class="font-extrabold">Heavy Metal</strong> (˶ᵔ ᵕ ᵔ˶) uwu.
+		</p>
+		<p class="text-base leading-relaxed">
+		    Mi lenguaje favorito es <strong class="font-extrabold">Go</strong>,
+		    por su simplicidad y lo divertido que es,
+		    aunque también manejo bastante bien <strong class="font-extrabold">Python</strong>,
+		    <strong class="font-extrabold">Node.js</strong>, <strong class="font-extrabold">Bun</strong>
+		    y <strong class="font-extrabold">PHP</strong>.
+		</p>
+		<p class="text-muted-foreground">
+		    (i use arch linux btw (≧◡≦))
+		</p>
+	</section>
+}
+
+templ SoftwareSection(software []Links) {
+	<section class="mt-15 mb-16">
+		<h2 class="flex items-center text-primary text-2xl font-bold mb-6 border-b border-border pb-3">
+			Software
+		</h2>
+		<ul class="ml-6 mt-2 space-y-1">
+			for _, s := range software {
+				<li>
+					<a href={ s.URL } target="_blank" class="flex text-foreground font-normal hover:underline">
+						{ s.Label }
+					</a>
+					<p class="text-muted-foreground text-sm">{ s.Text }</p>
+				</li>
+			}
+		</ul>
+	</section>
+}
+
+templ LinksSection(links []Links) {
+	<section class="mb-16">
+		<h2 class="flex items-center text-primary text-2xl font-bold mb-6 border-b border-border pb-3">
+			Enlaces
+		</h2>
+		<p class="text-base leading-relaxed mb-4">
+			¿Tienes preguntas o quieres que colaboremos?
+		</p>
+		<p class="text-base leading-relaxed mb-4">
+			Estoy disponible para proyectos freelance o nuevas oportunidades laborales.
+			Mira mi <a class="underline" href="https://assets.loadept.com/cv.pdf" target="_blank">resumen profesional</a>
+			para conocer mi trayectoria.
+		</p>
+		<ul class="space-y-2">
+			for _, l := range links {
+				<li>
+					<strong>{ l.Label + ": " }</strong>
+					<a href={ l.URL } target="_blank" class="text-primary hover:underline">
+						{ l.Text }
+					</a>
+				</li>
+			}
+		</ul>
+	</section>
+}
+
+templ Index(props Props) {
+	@Layout(props) {
+		<main class="grow">
+			<div class="max-w-2xl mx-auto px-6 py-12">
+				@AboutSection()
+				@SoftwareSection(props.Software)
+				@LinksSection(props.Links)
+			</div>
+		</main>
+	}
+}

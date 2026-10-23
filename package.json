@@ -1,9 +1,10 @@
 {
   "scripts": {
-    "dev": "bun run --cwd ui dev",
-    "build": "bun run --cwd ui build",
-    "preview": "bun run --cwd ui preview",
-    "astro": "bun run --cwd ui astro",
-    "install:ui": "bun install --cwd ui"
+    "css:dev": "bunx @tailwindcss/cli -i ./web/static/css/global.css -o ./web/static/css/global.min.css -w",
+    "css:min": "bunx @tailwindcss/cli -i ./web/static/css/global.css -o ./web/static/css/global.min.css -m"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
   }
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -12,11 +13,11 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/joho/godotenv"
-	"github.com/loadept/website/internal/gopackages"
+	"github.com/loadept/website/internal/config"
 	"github.com/loadept/website/internal/middleware"
 	"github.com/loadept/website/internal/short"
-	"github.com/loadept/website/ui"
+	"github.com/loadept/website/internal/website"
+	"github.com/loadept/website/web/static"
 	"zombiezen.com/go/sqlite"
 	"zombiezen.com/go/sqlite/sqlitex"
 )
@@ -27,22 +28,10 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
-	_ = godotenv.Overload()
+	cfg, err := config.Load()
+	fatalIfErr(err)
 
-	db := os.Getenv("DB_PATH")
-	addr := os.Getenv("ADDR")
-	githubUser := os.Getenv("GITHUB_USER")
-	if db == "" {
-		log.Fatalf("env var DB_PATH is required")
-	}
-	if addr == "" {
-		log.Fatalf("env var ADDR is required")
-	}
-	if githubUser == "" {
-		log.Fatalf("env var GITHUB_USER is required")
-	}
-
-	pool, err := sqlitex.NewPool(db, sqlitex.PoolOptions{
+	pool, err := sqlitex.NewPool(cfg.DBPath, sqlitex.PoolOptions{
 		PoolSize: 3,
 		PrepareConn: func(conn *sqlite.Conn) error {
 			return sqlitex.ExecuteScript(conn, `
@@ -58,16 +47,17 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
+	fileServ := http.FileServerFS(static.FS)
 	shortHandler := short.NewHandler(short.NewRepo(pool))
-	goPkg := gopackages.NewHandler(githubUser)
+	webHandler := website.NewHandler(cfg.AppURL)
 
-	fileServ := http.FileServerFS(ui.FS)
+	r.Get("/", webHandler.Index)
+	r.Get("/go/{pkg}", webHandler.ServePkg)
 	r.Get("/s/{code}", shortHandler.RedirectURL)
-	r.Get("/go/{pkg}", goPkg.ServePkg)
-	r.Get("/*", func(w http.ResponseWriter, r *http.Request) { fileServ.ServeHTTP(w, r) })
+	r.Handle("GET /static/*", http.StripPrefix("/static/", fileServ))
 
 	server := http.Server{
-		Addr:         addr,
+		Addr:         cfg.Addr,
 		Handler:      r,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -93,6 +83,7 @@ func main() {
 
 func fatalIfErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
 	}
 }

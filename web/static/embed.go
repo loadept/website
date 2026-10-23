@@ -1,15 +1,14 @@
-package ui
+package static
 
 import (
 	"embed"
-	"fmt"
 	"io/fs"
 	"path"
 	"strings"
 )
 
-//go:embed all:dist
-var distFS embed.FS
+//go:embed css/global.min.css fonts images
+var staticFS embed.FS
 
 type neuteredFS struct{ fs fs.FS }
 
@@ -41,10 +40,5 @@ func (n *neuteredFS) Open(name string) (fs.File, error) {
 var FS fs.FS
 
 func init() {
-	fs, err := fs.Sub(distFS, "dist")
-	if err != nil {
-		panic(fmt.Sprintf("embedded frontend could not be mounted: %v", err))
-	}
-
-	FS = &neuteredFS{fs}
+	FS = &neuteredFS{staticFS}
 }

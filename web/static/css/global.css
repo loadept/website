@@ -1,9 +1,8 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 
 @font-face {
     font-family: 'firacode';
-    src: url('/fonts/firacode-subset.woff2') format('woff2');
+    src: url('/static/fonts/firacode-subset.woff2') format('woff2');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
@@ -133,4 +132,3 @@
     @apply transition-colors duration-300;
   }
 }
-

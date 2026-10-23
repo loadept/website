@@ -1,0 +1,21 @@
+package template
+
+templ Gopkg(domain, pkg, githubURL string) {
+	<!doctype html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8" />
+			<meta name="go-import" content={ domain + "/go/" + pkg + " git " +  githubURL + "/" + pkg } />
+			<meta http-equiv="refresh" content={ "0; url=https://pkg.go.dev/" + domain + "/go/" + pkg } />
+			<title>{ pkg }</title>
+		</head>
+		<body>
+			<p>
+				Nothing to see here;
+				<a href={ "https://pkg.go.dev/" + domain + "/go/" + pkg }>
+					see the package on pkg.go.dev.
+				</a>
+			</p>
+		</body>
+	</html>
+}
