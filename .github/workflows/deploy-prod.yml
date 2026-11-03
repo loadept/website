@@ -20,22 +20,5 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
-            cd /srv/loadept
-            docker compose pull
-            docker compose up -d
-            docker image prune -f
-
-  notify:
-    needs: deploy-on-server
-    if: always()
-    uses: loadept/notifier/.github/workflows/notify.yml@main
-    with:
-      status: ${{ needs.deploy-on-server.result }}
-      repo: ${{ github.repository }}
-      branch: ${{ github.ref_name }}
-      commit: ${{ github.sha }}
-      actor: ${{ github.actor }}
-      message: ${{ github.event.head_commit.message }}
-    secrets:
-      NOTIFY_SECRET: ${{ secrets.NOTIFY_SECRET }}
-      NOTIFY_WEBHOOK: ${{ secrets.NOTIFY_WEBHOOK }}
+            podman auto-update
+            podman image prune -f
