@@ -29,6 +29,11 @@ var software = []template.Links{
 		Text:  "Mira cómo funcionan los websockets con este experimento.",
 		URL:   "https://live.loadept.com",
 	},
+	{
+		Label: "playground",
+		Text:  "Repo con mis expermientos de código, pruebas, prototipos en distintos lenguajes.",
+		URL:   "https://github.com/loadept/playground",
+	},
 }
 
 var links = []template.Links{
