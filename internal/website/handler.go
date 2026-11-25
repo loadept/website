@@ -15,6 +15,11 @@ var software = []template.Links{
 		URL:   "https://github.com/loadept/wirq",
 	},
 	{
+		Label: "ipseek",
+		Text:  "API gratuita para obtener la información y localización de una IP.",
+		URL:   "https://ipseek.space",
+	},
+	{
 		Label: "db-mcp",
 		Text:  "Servidor MCP para multiples bases de datos (solo lectura).",
 		URL:   "https://loadept.com/s/uEZQ",
@@ -23,11 +28,6 @@ var software = []template.Links{
 		Label: "cursor-live",
 		Text:  "Mira cómo funcionan los websockets con este experimento.",
 		URL:   "https://live.loadept.com",
-	},
-	{
-		Label: "ipseek",
-		Text:  "API gratuita para obtener la información y localización de una IP.",
-		URL:   "https://ipseek.space",
 	},
 }
 
