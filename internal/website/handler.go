@@ -2,7 +2,7 @@ package website
 
 import (
 	"net/http"
-	"strings"
+	"net/url"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/loadept/website/web/template"
@@ -23,11 +23,6 @@ var software = []template.Links{
 		Label: "db-mcp",
 		Text:  "Servidor MCP para multiples bases de datos (solo lectura).",
 		URL:   "https://loadept.com/s/uEZQ",
-	},
-	{
-		Label: "cursor-live",
-		Text:  "Mira cómo funcionan los websockets con este experimento.",
-		URL:   "https://live.loadept.com",
 	},
 	{
 		Label: "playground",
@@ -69,31 +64,40 @@ var (
 	description = "Mi sitio web personal, comparto recursos relacionados con el desarrollo de software :) ."
 )
 
-func NewHandler(appURL string) *Handler {
-	return new(Handler{appURL: appURL})
+func NewHandler(appURL *url.URL, githubURL *url.URL) *Handler {
+	return new(Handler{appURL: appURL, githubURL: appURL})
 }
 
 type Handler struct {
-	appURL    string
-	githubURL string
+	appURL    *url.URL
+	githubURL *url.URL
 }
 
 func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
-	appURL := strings.TrimPrefix(h.appURL, "/")
-
 	props := template.Props{
 		Title:       title,
 		Description: description,
-		Image:       appURL + "/static/images/draw.webp",
-		Canonical:   appURL,
+		Image:       h.appURL.JoinPath("static", "images", "draw.webp").String(),
+		Canonical:   h.appURL.String(),
 		Software:    software,
 		Links:       links,
 	}
 	template.Index(props).Render(r.Context(), w)
 }
 
-func (p *Handler) ServePkg(w http.ResponseWriter, r *http.Request) {
+var vanityPackages = map[string]bool{
+	"asyncker": true,
+}
+
+func (h *Handler) ServePkg(w http.ResponseWriter, r *http.Request) {
 	pkg := chi.URLParam(r, "pkg")
 
-	template.Gopkg(r.Host, pkg, p.githubURL).Render(r.Context(), w)
+	if !vanityPackages[pkg] {
+		http.NotFound(w, r)
+		return
+	}
+
+	dom := h.appURL.Hostname()
+	repo := h.githubURL.JoinPath(pkg).String()
+	template.Gopkg(dom, pkg, repo).Render(r.Context(), w)
 }

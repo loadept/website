@@ -14,9 +14,9 @@ import (
 
 type Config struct {
 	Addr      string
-	AppURL    string
 	DBPath    string
-	GithubURL string
+	AppURL    *url.URL
+	GithubURL *url.URL
 }
 
 func Load() (*Config, error) {
@@ -34,7 +34,7 @@ func Load() (*Config, error) {
 	if err != nil || au.Scheme == "" || au.Host == "" {
 		return nil, errors.New("env var APP_URL is invalid")
 	}
-	cfg.AppURL = appURL
+	cfg.AppURL = au
 
 	dbPath := Env("DB_PATH")
 	if dbPath == "" {
@@ -50,7 +50,7 @@ func Load() (*Config, error) {
 	if err != nil || gu.Scheme == "" || gu.Host == "" {
 		return nil, errors.New("env var GITHUB_URL is invalid")
 	}
-	cfg.GithubURL = githubURL
+	cfg.GithubURL = gu
 
 	return cfg, nil
 }
