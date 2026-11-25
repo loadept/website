@@ -255,20 +255,20 @@ func AboutSection() templ.Component {
 			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<section class=\"mb-16 space-y-4\"><p class=\"text-base leading-relaxed\">Mi nombre Jesus Gonzalo Machaca Hancco, tengo ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<section class=\"mb-16 space-y-4\"><p class=\"text-base leading-relaxed\">Mi nombre es Jesus Gonzalo, tengo ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(currentYear - 2003)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 138, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 137, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " años y vivo en <strong class=\"font-extrabold\">Perú</strong>. Soy desarrollador de software <strong class=\"font-extrabold\">backend</strong> y me encanta el software libre y el open source. Paso la mayor parte del tiempo diseñando y construyendo software, casi siempre con música de fondo, sobre todo <strong class=\"font-extrabold\">Heavy Metal</strong> (˶ᵔ ᵕ ᵔ˶) uwu.</p><p class=\"text-base leading-relaxed\">Mi lenguaje favorito es <strong class=\"font-extrabold\">Go</strong>, por su simplicidad y lo divertido que es, aunque también manejo bastante bien <strong class=\"font-extrabold\">Python</strong>, <strong class=\"font-extrabold\">Node.js</strong>, <strong class=\"font-extrabold\">Bun</strong> y <strong class=\"font-extrabold\">PHP</strong>.</p><p class=\"text-muted-foreground\">(i use arch linux btw (≧◡≦))</p></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " años y vivo en <strong class=\"font-extrabold\">Perú</strong>. Soy desarrollador de software. Casi todo lo que hago tiene que ver con redes, la web y Linux (servidores, proxies, la nube, CLIs), pero lo que de verdad me gusta es entender lo que pasa por debajo. Por eso también programo a bajo nivel con C: pointers, allocations, el control absoluto que te da sobre la memoria y el sistema operativo.</p><p class=\"text-base leading-relaxed\">Mi lenguaje favorito es <strong class=\"font-extrabold\">Go</strong>, por lo simple y lo divertido que es; además, tiene muchos conceptos de bajo nivel: pointers, buffers, syscalls, I/O y su integración directa con C. Y claramente es muy bueno para desarrollo en redes y la nube, y las <strong class=\"font-extrabold\">Goroutines</strong> son lo mejor. También manejo bastante bien <strong class=\"font-extrabold\">Python</strong>, <strong class=\"font-extrabold\">Node.js</strong>, <strong class=\"font-extrabold\">Bun</strong>, <strong class=\"font-extrabold\">PHP</strong> y mucho <strong class=\"font-extrabold\">SQL</strong>.</p><p>Casi siempre programo con música de fondo, sobre todo <strong class=\"font-extrabold\">heavy metal</strong> (˶ᵔ ᵕ ᵔ˶) uwu.</p><p class=\"text-muted-foreground\">(i use arch linux btw (≧◡≦))</p></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -309,7 +309,7 @@ func SoftwareSection(software []Links) templ.Component {
 			var templ_7745c5c3_Var15 templ.SafeURL
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(s.URL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 165, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 170, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -322,7 +322,7 @@ func SoftwareSection(software []Links) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(s.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 166, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 171, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -335,7 +335,7 @@ func SoftwareSection(software []Links) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(s.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 168, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 173, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -387,7 +387,7 @@ func LinksSection(links []Links) templ.Component {
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(l.Label + ": ")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 191, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 196, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -400,7 +400,7 @@ func LinksSection(links []Links) templ.Component {
 			var templ_7745c5c3_Var20 templ.SafeURL
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(l.URL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 192, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 197, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -413,7 +413,7 @@ func LinksSection(links []Links) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(l.Text)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 193, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/template/index.templ`, Line: 198, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
