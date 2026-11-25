@@ -65,7 +65,7 @@ var (
 )
 
 func NewHandler(appURL *url.URL, githubURL *url.URL) *Handler {
-	return new(Handler{appURL: appURL, githubURL: appURL})
+	return new(Handler{appURL: appURL, githubURL: githubURL})
 }
 
 type Handler struct {

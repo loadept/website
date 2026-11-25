@@ -49,7 +49,7 @@ func main() {
 
 	fileServ := http.FileServerFS(static.FS)
 	shortHandler := short.NewHandler(short.NewRepo(pool))
-	webHandler := website.NewHandler(cfg.AppURL)
+	webHandler := website.NewHandler(cfg.AppURL, cfg.GithubURL)
 
 	r.Get("/", webHandler.Index)
 	r.Get("/go/{pkg}", webHandler.ServePkg)

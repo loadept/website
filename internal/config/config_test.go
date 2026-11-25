@@ -54,9 +54,9 @@ func TestLoad_Defaults(t *testing.T) {
 		return
 	}
 	assert.Equal(t, "127.0.0.1:8080", cfg.Addr)
-	assert.Equal(t, "http://localhost:8080", cfg.AppURL)
+	assert.Equal(t, "http://localhost:8080", cfg.AppURL.String())
 	assert.Equal(t, "test.db", cfg.DBPath)
-	assert.Equal(t, "https://github.com/example", cfg.GithubURL)
+	assert.Equal(t, "https://github.com/example", cfg.GithubURL.String())
 }
 
 func TestLoad_FromEnv(t *testing.T) {
@@ -71,9 +71,9 @@ func TestLoad_FromEnv(t *testing.T) {
 		return
 	}
 	assert.Equal(t, ":9090", cfg.Addr)
-	assert.Equal(t, "https://example.com", cfg.AppURL)
+	assert.Equal(t, "https://example.com", cfg.AppURL.String())
 	assert.Equal(t, "/var/data/app.db", cfg.DBPath)
-	assert.Equal(t, "https://github.com/loadept", cfg.GithubURL)
+	assert.Equal(t, "https://github.com/loadept", cfg.GithubURL.String())
 }
 
 func TestLoad_Errors(t *testing.T) {
