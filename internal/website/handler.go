@@ -98,6 +98,6 @@ func (h *Handler) ServePkg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dom := h.appURL.Hostname()
-	repo := h.githubURL.JoinPath(pkg).String()
-	template.Gopkg(dom, pkg, repo).Render(r.Context(), w)
+	ghurl := h.githubURL.String()
+	template.Gopkg(dom, ghurl, pkg).Render(r.Context(), w)
 }
